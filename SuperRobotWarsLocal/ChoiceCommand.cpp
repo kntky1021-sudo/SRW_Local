@@ -7,31 +7,7 @@
 ChoiceCommand::ChoiceCommand(const nlohmann::json& evt)
     : prompt_(""), options_(), resultLabels_()
 {
-    if (evt.contains("prompt") && evt["prompt"].is_string()) {
-        prompt_ = evt["prompt"].get<std::string>();
-    }
-    else {
-        std::cerr << "[ChoiceCommand] missing or wrong type for \"prompt\"\n";
-    }
-
-    if (evt.contains("options") && evt["options"].is_array()) {
-        for (auto& el : evt["options"]) {
-            if (el.is_string()) {
-                options_.push_back(el.get<std::string>());
-            }
-        }
-    }
-    else {
-        std::cerr << "[ChoiceCommand] missing or wrong type for \"options\"\n";
-    }
-
-    if (evt.contains("resultLabels") && evt["resultLabels"].is_array()) {
-        for (auto& el : evt["resultLabels"]) {
-            if (el.is_string()) {
-                resultLabels_.push_back(el.get<std::string>());
-            }
-        }
-    }
+    // …省略…
 }
 
 void ChoiceCommand::execute(ExecutionEngine& engine) {
@@ -40,16 +16,21 @@ void ChoiceCommand::execute(ExecutionEngine& engine) {
         return;
     }
 
+    // 1) プロンプトを表示してキー待ち
     engine.ui->showMessage(prompt_);
     engine.input->waitKey();
 
+    // 2) 選択肢を表示して入力待ち
     engine.ui->promptChoice(options_);
     int choice = engine.input->waitForChoice(static_cast<int>(options_.size()));
-
     if (choice < 0 || choice >= static_cast<int>(resultLabels_.size())) {
         choice = 0;
     }
 
+    // 3) 結果ラベルを表示→キー待ち
     engine.ui->showMessage(resultLabels_[choice]);
     engine.input->waitKey();
+
+    // 4) ダイアログ終了後にゲーム画面を再描画
+    engine.redraw();
 }

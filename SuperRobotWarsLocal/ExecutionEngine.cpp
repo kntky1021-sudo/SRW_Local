@@ -74,20 +74,39 @@ void ExecutionEngine::run(const std::string& scriptPath) {
     }
 }
 
+
 void ExecutionEngine::redraw() {
+    // SDLRenderer 経由で SDL_Renderer* を取得
     auto* rdr = ui->getRenderer();
+    auto* sdlR = rdr->getSDLRenderer();
+
+    // 1) ゲーム背景用のクリア色をセット（たとえば黒）
+    SDL_SetRenderDrawColor(sdlR,
+        0,   // R
+        0,   // G
+        0,   // B
+        SDL_ALPHA_OPAQUE);
+
+    // 2) クリア
     rdr->clear();
 
-    // カーソル位置(px)をターゲットにしてカメラ更新
+    // 3) カメラ更新（カーソルを中央に追従）
     camera_.update(cursor->getX() * tileMap->getTileWidth(),
         cursor->getY() * tileMap->getTileHeight());
-
     const int ox = camera_.getOffsetX();
     const int oy = camera_.getOffsetY();
 
-    if (tileMap)       tileMap->render(ox, oy);
-    if (battleManager) battleManager->renderUnits(rdr, ox, oy);
-    if (cursor)        cursor->render(ox, oy);
+    // 4) マップ・ユニット・カーソルを描画
+    if (tileMap) {
+        tileMap->render(ox, oy);
+    }
+    if (battleManager) {
+        battleManager->renderUnits(rdr, ox, oy);
+    }
+    if (cursor) {
+        cursor->render(ox, oy);
+    }
 
+    // 5) 最後に画面更新
     rdr->present();
 }

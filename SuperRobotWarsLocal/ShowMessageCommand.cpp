@@ -16,10 +16,14 @@ ShowMessageCommand::ShowMessageCommand(const nlohmann::json& evt)
 }
 
 void ShowMessageCommand::execute(ExecutionEngine& engine) {
+    // 1) テキストを UI レイヤーに描画（画面全体を clear→text→present）
     if (engine.ui) {
         engine.ui->showMessage(text_);
     }
+    // 2) キー入力で待機
     if (engine.input) {
         engine.input->waitKey();
     }
+    // 3) ダイアログ終了後に必ずゲーム画面を再描画
+    engine.redraw();
 }
