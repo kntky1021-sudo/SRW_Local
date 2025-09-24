@@ -1,0 +1,3 @@
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\x64\Debug\scripts\sample_script.json
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\x64\Debug\maps\map_f01_01.json
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\x64\Debug\assets\font.bmp

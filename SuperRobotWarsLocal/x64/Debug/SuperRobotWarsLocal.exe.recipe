@@ -1,0 +1,21 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <ProjectOutputs>
+    <ProjectOutput>
+      <FullPath>C:\Users\kntky\source\repos\SuperRobotWarsLocal\x64\Debug\SuperRobotWarsLocal.exe</FullPath>
+    </ProjectOutput>
+  </ProjectOutputs>
+  <ContentFiles>
+    <ContentFile>
+      <FullPath>C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\assets\font.bmp</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\maps\map_f01_01.json</FullPath>
+    </ContentFile>
+    <ContentFile>
+      <FullPath>C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\scripts\sample_script.json</FullPath>
+    </ContentFile>
+  </ContentFiles>
+  <SatelliteDlls />
+  <NonRecipeFileRefs />
+</Project>

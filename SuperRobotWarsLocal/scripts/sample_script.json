@@ -1,0 +1,30 @@
+[
+    {
+        "type": "showMessage",
+        "text": "ようこそ、SRPGの世界へ！"
+    },
+    {
+        "type": "battleStart",
+        "map": "maps/map01.json"
+    },
+    {
+        "type": "move",
+        "unitId": 0,
+        "to": [ 5, 3 ]
+    },
+    {
+        "type": "playerMove",
+        "unitId": 0,
+        "snapToUnit": true
+    },
+    {
+        "type": "choice",
+        "prompt": "次はどうする？",
+        "options": [ "攻撃", "防御", "回避" ],
+        "resultLabels": [ "攻撃します", "防御します", "回避します" ]
+    },
+    {
+        "type": "showMessage",
+        "text": "シナリオ終了です"
+    }
+]
