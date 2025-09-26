@@ -139,6 +139,8 @@
     <ClCompile Include="ChoiceCommand.cpp" />
     <ClCompile Include="CommandFactory.cpp" />
     <ClCompile Include="Cursor.cpp" />
+    <ClCompile Include="EnemyAttackCommand.cpp" />
+    <ClCompile Include="EnemyMoveCommand.cpp" />
     <ClCompile Include="ExecutionEngine.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="main.cpp" />
@@ -165,6 +167,8 @@
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandFactory.h" />
     <ClInclude Include="Cursor.h" />
+    <ClInclude Include="EnemyAttackCommand.h" />
+    <ClInclude Include="EnemyMoveCommand.h" />
     <ClInclude Include="ExecutionEngine.h" />
     <ClInclude Include="ICommandHandler.h" />
     <ClInclude Include="InputManager.h" />

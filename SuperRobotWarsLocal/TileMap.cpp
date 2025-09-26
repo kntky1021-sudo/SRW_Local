@@ -1,128 +1,79 @@
 #include "TileMap.h"
-#include "SDLRenderer.h"
-#include <fstream>
-#include <nlohmann/json.hpp>
 #include <SDL.h>
 #include <iostream>
-#include <limits>
 
-TileMap::TileMap(SDLRenderer* renderer)
+TileMap::TileMap(SDL_Renderer* renderer, int tileWidth, int tileHeight)
     : renderer_(renderer)
-    , tilesetTex_(nullptr)
-    , mapW_(0)
-    , mapH_(0)
-    , tileW_(0)
-    , tileH_(0)
+    , texture_(nullptr)
+    , mapWidth_(0)
+    , mapHeight_(0)
+    , tileWidth_(tileWidth)
+    , tileHeight_(tileHeight)
+    , textureWidth_(0)
+    , textureHeight_(0)
 {
 }
 
 TileMap::~TileMap() {
-    if (tilesetTex_) {
-        SDL_DestroyTexture(tilesetTex_);
+    if (texture_) {
+        SDL_DestroyTexture(texture_);
     }
 }
 
-bool TileMap::loadFromFile(const std::string& jsonPath,
-    const std::string& tilesetBmpPath,
-    int tileWidth,
-    int tileHeight)
-{
-    std::ifstream ifs(jsonPath);
-    if (!ifs) {
-        std::cerr << "[TileMap] cannot open " << jsonPath << "\n";
-        return false;
-    }
-
-    nlohmann::json j;
-    try {
-        ifs >> j;
-    }
-    catch (const nlohmann::json::exception& e) {
-        std::cerr << "[TileMap] JSON parse error: " << e.what() << "\n";
-        return false;
-    }
-
-    mapW_ = j.value("width", 0);
-    mapH_ = j.value("height", 0);
-    tileW_ = tileWidth;
-    tileH_ = tileHeight;
-
-    auto arr = j.value("tiles", nlohmann::json::array());
-    tiles_.clear();
-    tiles_.reserve(mapW_ * mapH_);
-    for (auto& v : arr) {
-        tiles_.push_back(v.get<int>());
-    }
-
-    SDL_Surface* surf = SDL_LoadBMP(tilesetBmpPath.c_str());
+bool TileMap::loadFromFile(const std::string& mapPath) {
+    // BMP 形式のファイルを読み込む例（後で IMG_Load などに置き換えても OK）
+    SDL_Surface* surf = SDL_LoadBMP(mapPath.c_str());
     if (!surf) {
-        std::cerr << "[TileMap] SDL_LoadBMP failed: " << SDL_GetError() << "\n";
+        std::cerr << "[TileMap] SDL_LoadBMP failed: "
+            << SDL_GetError() << "\n";
         return false;
     }
-
-    tilesetTex_ = SDL_CreateTextureFromSurface(
-        renderer_->getSDLRenderer(), surf);
-    SDL_DestroySurface(surf);
-
-    if (!tilesetTex_) {
+    texture_ = SDL_CreateTextureFromSurface(renderer_, surf);
+    SDL_FreeSurface(surf);
+    if (!texture_) {
         std::cerr << "[TileMap] CreateTexture failed: "
             << SDL_GetError() << "\n";
         return false;
     }
 
+    // テクスチャ全体サイズを取得
+    SDL_QueryTexture(texture_, nullptr, nullptr,
+        &textureWidth_, &textureHeight_);
+
+    // マップの「タイル数」を計算
+    mapWidth_ = textureWidth_ / tileWidth_;
+    mapHeight_ = textureHeight_ / tileHeight_;
+
+    std::cout << "[TileMap] loaded " << mapPath
+        << " (" << mapWidth_ << "x" << mapHeight_
+        << " tiles)\n";
     return true;
 }
 
-void TileMap::render(int offsetX, int offsetY) const {
-    if (!tilesetTex_) return;
-
-    float fTexW = 0.0f, fTexH = 0.0f;
-    if (SDL_GetTextureSize(tilesetTex_, &fTexW, &fTexH)) {
-        std::cerr << "[TileMap] SDL_GetTextureSize failed: "
-            << SDL_GetError() << "\n";
-        return;
-    }
-
-    int texW = static_cast<int>(fTexW);
-    int tilesPerRow = texW / tileW_;
-
-    for (int y = 0; y < mapH_; ++y) {
-        for (int x = 0; x < mapW_; ++x) {
-            int idx = tiles_[y * mapW_ + x];
-            if (idx < 0) continue;
-
-            int tx = (idx % tilesPerRow) * tileW_;
-            int ty = (idx / tilesPerRow) * tileH_;
-
-            SDL_FRect src{
-                static_cast<float>(tx),
-                static_cast<float>(ty),
-                static_cast<float>(tileW_),
-                static_cast<float>(tileH_)
-            };
-            SDL_FRect dst{
-                static_cast<float>(x * tileW_ - offsetX),
-                static_cast<float>(y * tileH_ - offsetY),
-                static_cast<float>(tileW_),
-                static_cast<float>(tileH_)
-            };
-
-            renderer_->drawTexture(tilesetTex_, src, dst);
-        }
-    }
+int TileMap::getCost(int mapX, int mapY) const {
+    // TODO: タイル種別に応じたコスト返却ロジックに差し替え
+    // 今は全マス cost=1 固定
+    (void)mapX; (void)mapY;
+    return 1;
 }
 
-// ----------------------------------------
-// 追加: getCost 実装
-int TileMap::getCost(int x, int y) const {
-    // 範囲外は歩けない扱い（非常に大きなコスト）
-    if (x < 0 || y < 0 || x >= mapW_ || y >= mapH_) {
-        return std::numeric_limits<int>::max();
-    }
-    // タイルIDごとのコストを使う場合:
-    // int id = tiles_[y * mapW_ + x];
-    // return costMap_[id];
+void TileMap::render(int offsetX, int offsetY) const {
+    if (!texture_) return;
 
-    // 今はすべてコスト1とする
-    return 1;
+    SDL_Rect src, dst;
+    for (int ty = 0; ty < mapHeight_; ++ty) {
+        for (int tx = 0; tx < mapWidth_; ++tx) {
+            src.x = tx * tileWidth_;
+            src.y = ty * tileHeight_;
+            src.w = tileWidth_;
+            src.h = tileHeight_;
+
+            dst.x = tx * tileWidth_ - offsetX;
+            dst.y = ty * tileHeight_ - offsetY;
+            dst.w = tileWidth_;
+            dst.h = tileHeight_;
+
+            SDL_RenderCopy(renderer_, texture_, &src, &dst);
+        }
+    }
 }

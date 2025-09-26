@@ -1,38 +1,38 @@
 #pragma once
 
 #include <string>
-#include <vector>
+#include <SDL.h>
 
-class SDLRenderer;
-struct SDL_Texture;
-
+/// @brief タイルマップの読み込み・描画を担うクラス
 class TileMap {
 public:
-    explicit TileMap(SDLRenderer* renderer);
+    /// コンストラクタ：SDL_Renderer とタイルサイズを渡す
+    TileMap(SDL_Renderer* renderer, int tileWidth, int tileHeight);
     ~TileMap();
 
-    bool loadFromFile(const std::string& jsonPath,
-        const std::string& tilesetBmpPath,
-        int tileWidth,
-        int tileHeight);
+    /// @brief ファイルからタイルセット画像を読み込む
+    /// @return 成功時 true
+    bool loadFromFile(const std::string& mapPath);
 
-    /// @param offsetX,offsetY カメラオフセット(pixel)
+    /// @brief 指定パスから読み込む (旧 load 互換)
+    bool load(const std::string& mapPath) { return loadFromFile(mapPath); }
+
+    /// @brief 指定マスの移動コストを返す（未実装時は常に1を返す）
+    int getCost(int mapX, int mapY) const;
+
     void render(int offsetX, int offsetY) const;
-
-    int getMapWidth() const { return mapW_; }
-    int getMapHeight() const { return mapH_; }
-    int getTileWidth() const { return tileW_; }
-    int getTileHeight() const { return tileH_; }
-
-    /// そのマスを移動するのに必要なコストを返す
-    /// 範囲外は非常に大きい値を返す
-    int getCost(int x, int y) const;
+    int  getMapWidth()  const { return mapWidth_; }
+    int  getMapHeight() const { return mapHeight_; }
+    int  getTileWidth() const { return tileWidth_; }
+    int  getTileHeight() const { return tileHeight_; }
 
 private:
-    SDLRenderer* renderer_;
-    SDL_Texture* tilesetTex_;
-    int                mapW_, mapH_;
-    int                tileW_, tileH_;
-    std::vector<int>   tiles_;
-    // 将来、タイルIDごとのコストを保持するならここに vector<int> costMap_;
+    SDL_Renderer* renderer_;
+    SDL_Texture* texture_;
+    int           mapWidth_;
+    int           mapHeight_;
+    int           tileWidth_;
+    int           tileHeight_;
+    int           textureWidth_;
+    int           textureHeight_;
 };

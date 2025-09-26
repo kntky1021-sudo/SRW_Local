@@ -1,5 +1,3 @@
-// src/ExecutionEngine.cpp
-
 #include "ExecutionEngine.h"
 #include "nlohmann/json.hpp"
 #include <fstream>
@@ -10,7 +8,9 @@
 #include "BattleStartCommand.h"
 #include "MoveCommand.h"
 #include "PlayerMoveCommand.h"
-#include "AttackCommand.h"              // ← 追加
+#include "AttackCommand.h"
+#include "EnemyMoveCommand.h"
+#include "EnemyAttackCommand.h"
 
 ExecutionEngine::ExecutionEngine(
     UIManager* uiMgr,
@@ -31,14 +31,14 @@ ExecutionEngine::ExecutionEngine(
         tileMap_->getMapHeight()* tileMap_->getTileHeight(),
         windowW,
         windowH)
+    , currentPhase_(Phase::Script)
 {
 }
 
 void ExecutionEngine::run(const std::string& scriptPath) {
     std::ifstream ifs(scriptPath);
     if (!ifs) {
-        std::cerr << "[ExecutionEngine] Failed to open: "
-            << scriptPath << "\n";
+        std::cerr << "[ExecutionEngine] Failed to open: " << scriptPath << "\n";
         return;
     }
 
@@ -56,79 +56,68 @@ void ExecutionEngine::run(const std::string& scriptPath) {
         return;
     }
 
+    // キュー構築
     commands_.clear();
+    commandPhases_.clear();
+
     for (auto& evt : j) {
         auto type = evt.value("type", "");
+        Phase ph = Phase::Script;
+
         if (type == "showMessage") {
+            ph = Phase::Script;
             commands_.push_back(std::make_unique<ShowMessageCommand>(evt));
         }
         else if (type == "battleStart") {
+            ph = Phase::Script;
             commands_.push_back(std::make_unique<BattleStartCommand>(evt));
         }
         else if (type == "move") {
+            ph = Phase::Script;
             commands_.push_back(std::make_unique<MoveCommand>(evt));
         }
         else if (type == "playerMove") {
+            ph = Phase::PlayerMove;
             commands_.push_back(std::make_unique<PlayerMoveCommand>(evt));
         }
-        else if (type == "attack") {                      // ← ここを追加
+        else if (type == "attack") {
+            ph = Phase::PlayerAttack;
             commands_.push_back(std::make_unique<AttackCommand>(evt));
         }
+        else if (type == "enemyMove") {
+            ph = Phase::EnemyMove;
+            commands_.push_back(std::make_unique<EnemyMoveCommand>(evt));
+        }
+        else if (type == "enemyAttack") {
+            ph = Phase::EnemyAttack;
+            commands_.push_back(std::make_unique<EnemyAttackCommand>(evt));
+        }
+        else {
+            std::cerr << "[ExecutionEngine] Unknown command type: " << type << "\n";
+            continue;
+        }
+
+        commandPhases_.push_back(ph);
     }
 
+    // 実行ループ
     currentIndex_ = 0;
     while (currentIndex_ < commands_.size()) {
+        // 実行前に currentPhase_ を更新
+        currentPhase_ = commandPhases_[currentIndex_];
+
+        // フェイズ＆インデックスをログ出力
+        std::cout
+            << "[ExecutionEngine] Phase=" << static_cast<int>(currentPhase_)
+            << " Executing command#" << currentIndex_ << "\n";
+
         commands_[currentIndex_]->execute(*this);
         ++currentIndex_;
     }
 
-    // 全コマンド実行後に最後の画面を描画し、任意キー押下まで待機
+    // 最終描画＆キー待ち
     redraw();
     if (input) {
         input->waitKey();
     }
-}
-
-void ExecutionEngine::setHighlightTiles(
-    const std::vector<std::pair<int, int>>& tiles)
-{
-    highlightTiles_ = tiles;
-}
-
-void ExecutionEngine::redraw() {
-    auto* rdr = ui->getRenderer();
-    auto* sdlR = rdr->getSDLRenderer();
-
-    SDL_SetRenderDrawColor(sdlR, 0, 0, 0, SDL_ALPHA_OPAQUE);
-    rdr->clear();
-
-    camera_.update(
-        cursor->getX() * tileMap->getTileWidth(),
-        cursor->getY() * tileMap->getTileHeight());
-    int ox = camera_.getOffsetX();
-    int oy = camera_.getOffsetY();
-
-    if (tileMap)        tileMap->render(ox, oy);
-
-    // ハイライトタイル (半透明青)
-    if (!highlightTiles_.empty()) {
-        SDL_SetRenderDrawBlendMode(sdlR, SDL_BLENDMODE_BLEND);
-        SDL_SetRenderDrawColor(sdlR, 0, 0, 255, 128);
-        int tw = tileMap->getTileWidth();
-        int th = tileMap->getTileHeight();
-        for (auto& p : highlightTiles_) {
-            SDL_FRect frect{
-                static_cast<float>(p.first * tw - ox),
-                static_cast<float>(p.second * th - oy),
-                static_cast<float>(tw),
-                static_cast<float>(th)
-            };
-            SDL_RenderFillRect(sdlR, &frect);
-        }
-        SDL_SetRenderDrawBlendMode(sdlR, SDL_BLENDMODE_NONE);
-    }
-
-    if (battleManager)  battleManager->renderUnits(rdr, ox, oy);
-    if (cursor)         cursor->render(ox, oy);
-    rdr->present();
 }

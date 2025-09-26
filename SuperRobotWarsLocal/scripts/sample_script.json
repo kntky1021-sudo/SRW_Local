@@ -1,12 +1,14 @@
 [
     {
-        "type": "showMessage",
-        "text": "戦闘開始！"
-    },
-    {
         "type": "battleStart",
         "unitId": 1,
-        "enemyIds": [ 2, 3 ]
+        "enemyIds": [ 2, 3 ],
+        "mapPath": "maps/tileset.bmp",
+        "initPositions": {
+            "1": [ 2, 2 ],
+            "2": [ 5, 5 ],
+            "3": [ 6, 5 ]
+        }
     },
     {
         "type": "playerMove",
@@ -19,7 +21,17 @@
         "range": 1
     },
     {
+        "type": "enemyMove",
+        "unitId": 2,
+        "range": 5
+    },
+    {
+        "type": "enemyAttack",
+        "unitId": 2,
+        "range": 1
+    },
+    {
         "type": "showMessage",
-        "text": "シナリオ終了です"
+        "text": "シナリオ終了"
     }
 ]

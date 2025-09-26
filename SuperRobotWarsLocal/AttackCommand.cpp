@@ -1,5 +1,3 @@
-// src/AttackCommand.cpp
-
 #include "AttackCommand.h"
 #include "ExecutionEngine.h"
 #include "ReachableArea.h"

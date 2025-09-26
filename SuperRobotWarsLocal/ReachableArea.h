@@ -1,15 +1,13 @@
 #pragma once
-#pragma once
 
 #include <vector>
 #include <utility>
 
 class TileMap;
 
-/// @brief スタート地点 (startX,startY) から moveRange 以内に到達可能なマスを計算する
-/// @return 到達可能な (x,y) 座標のペア集合
-std::vector<std::pair<int, int>> computeReachable(
-    TileMap* tileMap,
+/// @brief マップ上の到達可能範囲を計算する (未実装 stub)
+std::vector<std::pair<int, int>>
+computeReachable(TileMap* map,
     int startX,
     int startY,
-    int moveRange);
+    int maxRange);

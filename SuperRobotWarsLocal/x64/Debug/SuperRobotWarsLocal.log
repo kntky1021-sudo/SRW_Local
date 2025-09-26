@@ -1,2 +1,56 @@
 ﻿  AttackCommand.cpp
-  SuperRobotWarsLocal.vcxproj -> C:\Users\kntky\source\repos\SuperRobotWarsLocal\x64\Debug\SuperRobotWarsLocal.exe
+  BattleStartCommand.cpp
+  ChoiceCommand.cpp
+  EnemyAttackCommand.cpp
+  EnemyMoveCommand.cpp
+  ExecutionEngine.cpp
+  main.cpp
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(22,26): error C2660: 'SDL_CreateWindow': 関数に 6 個の引数を指定できません。
+      C:\Users\kntky\Documents\inclideFolder\SDL3-devel-3.2.22-VC\SDL3-3.2.22\include\SDL3\SDL_video.h(1129,42):
+      'SDL_CreateWindow' の宣言を確認してください
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(22,26):
+      引数リスト '(const char [15], unsigned int, unsigned int, const int, const int, int)' を一致させようとしているとき
+  
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(39,9): error C2065: 'SDL_RENDERER_ACCELERATED': 定義されていない識別子です。
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(40,9): error C2065: 'SDL_RENDERER_PRESENTVSYNC': 定義されていない識別子です。
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(37,30): error C2664: 'SDL_Renderer *SDL_CreateRenderer(SDL_Window *,const char *)': 引数 2 を 'int' から 'const char *' へ変換できません。
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(38,17):
+      整数型からポインター型への変換には reinterpret_cast、C スタイル キャストまたはかっこで囲まれた関数スタイル キャストが必要です。
+      C:\Users\kntky\Documents\inclideFolder\SDL3-devel-3.2.22-VC\SDL3-3.2.22\include\SDL3\SDL_render.h(246,44):
+      'SDL_CreateRenderer' の宣言を確認してください
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(37,30):
+      引数リスト '(SDL_Window *, int)' を一致させようとしているとき
+  
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(60,28): error C2665: 'UIManager::UIManager': オーバーロードされた関数ですべての引数の型を変換できませんでした
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\UIManager.h(21,1):
+      'UIManager::UIManager(const UIManager &)' の可能性があります
+          C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(60,28):
+          'UIManager::UIManager(const UIManager &)': 引数 1 を 'SDL_Renderer *' から 'const UIManager &' へ変換できません。
+              C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(60,29):
+              理由: 'SDL_Renderer *' から 'const UIManager' へは変換できません。
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\UIManager.h(10,5):
+      または 'UIManager::UIManager(SDLRenderer *)'
+          C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(60,28):
+          'UIManager::UIManager(SDLRenderer *)': 引数 1 を 'SDL_Renderer *' から 'SDLRenderer *' へ変換できません。
+              C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(60,29):
+              指示された型は関連がありません。変換には reinterpret_cast、C スタイル キャストまたはかっこで囲まれた関数スタイル キャストが必要です。
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(60,28):
+      引数リスト '(SDL_Renderer *)' を一致させようとしているとき
+  
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(62,19): error C2512: 'Cursor': クラス、構造体、共用体に既定のコンストラクターがありません。
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\Cursor.h(4,7):
+      'Cursor' の宣言を確認してください
+  
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(63,19): error C2512: 'BattleManager': クラス、構造体、共用体に既定のコンストラクターがありません。
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\BattleManager.h(8,7):
+      'BattleManager' の宣言を確認してください
+  
+  MoveCommand.cpp
+  PlayerMoveCommand.cpp
+  ReachableArea.cpp
+  ShowMessageCommand.cpp
+  TileMap.cpp
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\TileMap.cpp(32,5): error C3861: 'SDL_FreeSurface_renamed_SDL_DestroySurface': 識別子が見つかりませんでした
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\TileMap.cpp(40,5): error C3861: 'SDL_QueryTexture': 識別子が見つかりませんでした
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\TileMap.cpp(76,13): error C3861: 'SDL_RenderCopy_renamed_SDL_RenderTexture': 識別子が見つかりませんでした
+  コードを生成中...

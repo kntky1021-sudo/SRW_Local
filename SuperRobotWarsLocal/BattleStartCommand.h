@@ -1,9 +1,8 @@
 #pragma once
-#include <nlohmann/json.hpp>
-#include <string>
-#include "Command.h"
 
-class ExecutionEngine;
+#include "Command.h"
+#include <nlohmann/json.hpp>
+#include <unordered_map>
 
 class BattleStartCommand : public Command {
 public:
@@ -11,7 +10,8 @@ public:
     void execute(ExecutionEngine& engine) override;
 
 private:
-    std::string mapSpec_; // JSONから受け取った生の指定（例: "maps/map01.json" など）
-
-    static std::string normalizeMapPath(const std::string& spec);
+    int                                  mainUnitId_;
+    std::vector<int>                    enemyIds_;
+    std::string                          mapPath_;
+    std::unordered_map<int, std::pair<int, int>> initPositions_;
 };
