@@ -24,7 +24,6 @@
         "resultLabels": [ "攻撃します", "防御します", "回避します" ]
     },
     {
-        "type": "showMessage",
-        "text": "シナリオ終了です"
+
     }
 ]

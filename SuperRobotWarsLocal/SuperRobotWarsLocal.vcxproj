@@ -144,6 +144,7 @@
     <ClCompile Include="MoveCommand.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="PlayerMoveCommand.cpp" />
+    <ClCompile Include="ReachableArea.cpp" />
     <ClCompile Include="ScriptLoader.cpp" />
     <ClCompile Include="SDLRenderer.cpp" />
     <ClCompile Include="ShowMessageCommand.cpp" />
@@ -169,6 +170,7 @@
     <ClInclude Include="MoveCommand.h" />
     <ClInclude Include="Parser.h" />
     <ClInclude Include="PlayerMoveCommand.h" />
+    <ClInclude Include="ReachableArea.h" />
     <ClInclude Include="ScriptLoader.h" />
     <ClInclude Include="SDLRenderer.h" />
     <ClInclude Include="ShowMessageCommand.h" />

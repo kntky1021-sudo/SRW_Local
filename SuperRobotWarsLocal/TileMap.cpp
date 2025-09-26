@@ -4,6 +4,7 @@
 #include <nlohmann/json.hpp>
 #include <SDL.h>
 #include <iostream>
+#include <limits>
 
 TileMap::TileMap(SDLRenderer* renderer)
     : renderer_(renderer)
@@ -62,8 +63,10 @@ bool TileMap::loadFromFile(const std::string& jsonPath,
     tilesetTex_ = SDL_CreateTextureFromSurface(
         renderer_->getSDLRenderer(), surf);
     SDL_DestroySurface(surf);
+
     if (!tilesetTex_) {
-        std::cerr << "[TileMap] CreateTexture failed: " << SDL_GetError() << "\n";
+        std::cerr << "[TileMap] CreateTexture failed: "
+            << SDL_GetError() << "\n";
         return false;
     }
 
@@ -74,8 +77,9 @@ void TileMap::render(int offsetX, int offsetY) const {
     if (!tilesetTex_) return;
 
     float fTexW = 0.0f, fTexH = 0.0f;
-    if (!SDL_GetTextureSize(tilesetTex_, &fTexW, &fTexH)) {
-        std::cerr << "[TileMap] SDL_GetTextureSize failed: " << SDL_GetError() << "\n";
+    if (SDL_GetTextureSize(tilesetTex_, &fTexW, &fTexH)) {
+        std::cerr << "[TileMap] SDL_GetTextureSize failed: "
+            << SDL_GetError() << "\n";
         return;
     }
 
@@ -106,4 +110,19 @@ void TileMap::render(int offsetX, int offsetY) const {
             renderer_->drawTexture(tilesetTex_, src, dst);
         }
     }
+}
+
+// ----------------------------------------
+// 追加: getCost 実装
+int TileMap::getCost(int x, int y) const {
+    // 範囲外は歩けない扱い（非常に大きなコスト）
+    if (x < 0 || y < 0 || x >= mapW_ || y >= mapH_) {
+        return std::numeric_limits<int>::max();
+    }
+    // タイルIDごとのコストを使う場合:
+    // int id = tiles_[y * mapW_ + x];
+    // return costMap_[id];
+
+    // 今はすべてコスト1とする
+    return 1;
 }

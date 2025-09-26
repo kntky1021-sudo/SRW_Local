@@ -11,6 +11,7 @@ C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp;C:\
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\MoveCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\MoveCommand.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\Parser.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\Parser.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\PlayerMoveCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\PlayerMoveCommand.obj
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\ReachableArea.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\ReachableArea.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\ScriptLoader.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\ScriptLoader.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\SDLRenderer.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\SDLRenderer.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\ShowMessageCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\ShowMessageCommand.obj

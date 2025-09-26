@@ -2,13 +2,15 @@
 #include "nlohmann/json.hpp"
 #include <fstream>
 #include <iostream>
+#include <SDL.h>
 
 #include "ShowMessageCommand.h"
 #include "BattleStartCommand.h"
 #include "MoveCommand.h"
 #include "PlayerMoveCommand.h"
 
-ExecutionEngine::ExecutionEngine(UIManager* uiMgr,
+ExecutionEngine::ExecutionEngine(
+    UIManager* uiMgr,
     InputManager* inputMgr,
     TileMap* tileMap_,
     Cursor* cursor_,
@@ -21,7 +23,8 @@ ExecutionEngine::ExecutionEngine(UIManager* uiMgr,
     , cursor(cursor_)
     , battleManager(battleMgr)
     , currentIndex_(0)
-    , camera_(tileMap_->getMapWidth()* tileMap_->getTileWidth(),
+    , camera_(
+        tileMap_->getMapWidth()* tileMap_->getTileWidth(),
         tileMap_->getMapHeight()* tileMap_->getTileHeight(),
         windowW,
         windowH)
@@ -31,7 +34,8 @@ ExecutionEngine::ExecutionEngine(UIManager* uiMgr,
 void ExecutionEngine::run(const std::string& scriptPath) {
     std::ifstream ifs(scriptPath);
     if (!ifs) {
-        std::cerr << "[ExecutionEngine] Failed to open: " << scriptPath << "\n";
+        std::cerr << "[ExecutionEngine] Failed to open: "
+            << scriptPath << "\n";
         return;
     }
 
@@ -44,7 +48,6 @@ void ExecutionEngine::run(const std::string& scriptPath) {
             << scriptPath << ": " << e.what() << "\n";
         return;
     }
-
     if (!j.is_array()) {
         std::cerr << "[ExecutionEngine] Script is not JSON array\n";
         return;
@@ -72,41 +75,72 @@ void ExecutionEngine::run(const std::string& scriptPath) {
         commands_[currentIndex_]->execute(*this);
         ++currentIndex_;
     }
+
+    // 全コマンド実行後に最後の画面を描画し、任意キー押下まで待機
+    redraw();
+    if (input) {
+        input->waitKey();
+    }
 }
 
+void ExecutionEngine::setHighlightTiles(
+    const std::vector<std::pair<int, int>>& tiles)
+{
+    highlightTiles_ = tiles;
+}
 
 void ExecutionEngine::redraw() {
-    // SDLRenderer 経由で SDL_Renderer* を取得
     auto* rdr = ui->getRenderer();
     auto* sdlR = rdr->getSDLRenderer();
 
-    // 1) ゲーム背景用のクリア色をセット（たとえば黒）
-    SDL_SetRenderDrawColor(sdlR,
-        0,   // R
-        0,   // G
-        0,   // B
-        SDL_ALPHA_OPAQUE);
-
-    // 2) クリア
+    // 1) ゲーム背景用クリア色を黒にセット
+    SDL_SetRenderDrawColor(sdlR, 0, 0, 0, SDL_ALPHA_OPAQUE);
     rdr->clear();
 
-    // 3) カメラ更新（カーソルを中央に追従）
-    camera_.update(cursor->getX() * tileMap->getTileWidth(),
+    // 2) カメラ更新
+    camera_.update(
+        cursor->getX() * tileMap->getTileWidth(),
         cursor->getY() * tileMap->getTileHeight());
-    const int ox = camera_.getOffsetX();
-    const int oy = camera_.getOffsetY();
+    int ox = camera_.getOffsetX();
+    int oy = camera_.getOffsetY();
 
-    // 4) マップ・ユニット・カーソルを描画
+    // 3) マップ描画
     if (tileMap) {
         tileMap->render(ox, oy);
     }
+
+    // 4) ハイライトタイル描画 (半透明青)
+    if (!highlightTiles_.empty()) {
+        SDL_SetRenderDrawBlendMode(sdlR, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawColor(sdlR, 0, 0, 255, 128);
+
+        int tw = tileMap->getTileWidth();
+        int th = tileMap->getTileHeight();
+        for (auto& p : highlightTiles_) {
+            // 整数計算後に SDL_FRect へキャスト
+            SDL_FRect frect{
+                static_cast<float>(p.first * tw - ox),
+                static_cast<float>(p.second * th - oy),
+                static_cast<float>(tw),
+                static_cast<float>(th)
+            };
+            SDL_RenderFillRect(sdlR, &frect);
+        }
+
+        // ブレンドモードを戻す
+        SDL_SetRenderDrawBlendMode(sdlR, SDL_BLENDMODE_NONE);
+    }
+
+    // 5) ユニット描画
     if (battleManager) {
         battleManager->renderUnits(rdr, ox, oy);
     }
+
+    // 6) カーソル描画
     if (cursor) {
         cursor->render(ox, oy);
     }
 
-    // 5) 最後に画面更新
+    // 7) プレゼンテーション
     rdr->present();
 }

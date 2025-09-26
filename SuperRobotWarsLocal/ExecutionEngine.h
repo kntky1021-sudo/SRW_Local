@@ -1,7 +1,10 @@
 #pragma once
+
 #include <string>
 #include <vector>
 #include <memory>
+#include <utility>
+
 #include "UIManager.h"
 #include "InputManager.h"
 #include "TileMap.h"
@@ -26,6 +29,9 @@ public:
     /// 現在の状態を再描画
     void redraw();
 
+    /// 移動可能範囲ハイライト用タイル座標セット
+    void setHighlightTiles(const std::vector<std::pair<int, int>>& tiles);
+
     // コマンド実装から直接アクセス可能に
     UIManager* ui;
     InputManager* input;
@@ -43,4 +49,7 @@ private:
     std::vector<std::unique_ptr<Command>> commands_;
     std::size_t    currentIndex_;
     Camera         camera_;
+
+    // 移動可能範囲ハイライトタイル
+    std::vector<std::pair<int, int>> highlightTiles_;
 };
