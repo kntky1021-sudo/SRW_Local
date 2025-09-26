@@ -131,6 +131,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AttackCommand.cpp" />
     <ClCompile Include="AudioManager.cpp" />
     <ClCompile Include="BattleManager.cpp" />
     <ClCompile Include="BattleStartCommand.cpp" />
@@ -155,6 +156,7 @@
     <ClCompile Include="WaitCommand.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AttackCommand.h" />
     <ClInclude Include="AudioManager.h" />
     <ClInclude Include="BattleManager.h" />
     <ClInclude Include="BattleMap.h" />

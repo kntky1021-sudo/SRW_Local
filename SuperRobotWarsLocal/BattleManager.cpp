@@ -47,4 +47,27 @@ void BattleManager::renderUnits(SDLRenderer* renderer,
         SDL_SetRenderDrawColor(sdlR, 255, 0, 0, 255);
         SDL_RenderRect(sdlR, &frect);
     }
+
+}
+// 指定座標にいるユニットIDを返す。いなければ -1。
+int BattleManager::getUnitAt(int x, int y) const {
+    for (size_t i = 0; i < units_.size(); ++i) {
+        if (units_[i].x == x && units_[i].y == y) {
+            return static_cast<int>(i);
+        }
+    }
+    return -1;
+}
+
+// ダメージ計算の stub 実装
+int BattleManager::calculateDamage(int attackerId, int defenderId) const {
+    // TODO: 実際の攻撃力・防御力計算を入れる
+    return 10;  // 仮ダメージ
+}
+
+// ダメージ適用の stub 実装
+void BattleManager::applyDamage(int unitId, int damage) {
+    // TODO: Unit に HP フィールドを追加し、減算する
+    std::cout << "[BattleManager] applyDamage unit " << unitId
+        << " damage " << damage << "\n";
 }

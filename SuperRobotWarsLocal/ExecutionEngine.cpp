@@ -1,3 +1,5 @@
+// src/ExecutionEngine.cpp
+
 #include "ExecutionEngine.h"
 #include "nlohmann/json.hpp"
 #include <fstream>
@@ -8,6 +10,7 @@
 #include "BattleStartCommand.h"
 #include "MoveCommand.h"
 #include "PlayerMoveCommand.h"
+#include "AttackCommand.h"              // ← 追加
 
 ExecutionEngine::ExecutionEngine(
     UIManager* uiMgr,
@@ -68,6 +71,9 @@ void ExecutionEngine::run(const std::string& scriptPath) {
         else if (type == "playerMove") {
             commands_.push_back(std::make_unique<PlayerMoveCommand>(evt));
         }
+        else if (type == "attack") {                      // ← ここを追加
+            commands_.push_back(std::make_unique<AttackCommand>(evt));
+        }
     }
 
     currentIndex_ = 0;
@@ -93,31 +99,24 @@ void ExecutionEngine::redraw() {
     auto* rdr = ui->getRenderer();
     auto* sdlR = rdr->getSDLRenderer();
 
-    // 1) ゲーム背景用クリア色を黒にセット
     SDL_SetRenderDrawColor(sdlR, 0, 0, 0, SDL_ALPHA_OPAQUE);
     rdr->clear();
 
-    // 2) カメラ更新
     camera_.update(
         cursor->getX() * tileMap->getTileWidth(),
         cursor->getY() * tileMap->getTileHeight());
     int ox = camera_.getOffsetX();
     int oy = camera_.getOffsetY();
 
-    // 3) マップ描画
-    if (tileMap) {
-        tileMap->render(ox, oy);
-    }
+    if (tileMap)        tileMap->render(ox, oy);
 
-    // 4) ハイライトタイル描画 (半透明青)
+    // ハイライトタイル (半透明青)
     if (!highlightTiles_.empty()) {
         SDL_SetRenderDrawBlendMode(sdlR, SDL_BLENDMODE_BLEND);
         SDL_SetRenderDrawColor(sdlR, 0, 0, 255, 128);
-
         int tw = tileMap->getTileWidth();
         int th = tileMap->getTileHeight();
         for (auto& p : highlightTiles_) {
-            // 整数計算後に SDL_FRect へキャスト
             SDL_FRect frect{
                 static_cast<float>(p.first * tw - ox),
                 static_cast<float>(p.second * th - oy),
@@ -126,21 +125,10 @@ void ExecutionEngine::redraw() {
             };
             SDL_RenderFillRect(sdlR, &frect);
         }
-
-        // ブレンドモードを戻す
         SDL_SetRenderDrawBlendMode(sdlR, SDL_BLENDMODE_NONE);
     }
 
-    // 5) ユニット描画
-    if (battleManager) {
-        battleManager->renderUnits(rdr, ox, oy);
-    }
-
-    // 6) カーソル描画
-    if (cursor) {
-        cursor->render(ox, oy);
-    }
-
-    // 7) プレゼンテーション
+    if (battleManager)  battleManager->renderUnits(rdr, ox, oy);
+    if (cursor)         cursor->render(ox, oy);
     rdr->present();
 }
