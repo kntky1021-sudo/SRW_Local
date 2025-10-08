@@ -14,6 +14,9 @@ public:
     int getX() const { return x_; }
     int getY() const { return y_; }
 
+    // 移動範囲取得（デフォルト値を返す）
+    int getMoveRange() const { return 5; }  // デフォルト移動力
+
 private:
     SDLRenderer* renderer_;
     int x_, y_;

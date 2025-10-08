@@ -9,12 +9,14 @@ C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\Cursor.cpp;C
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\EnemyAttackCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\EnemyAttackCommand.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\EnemyMoveCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\EnemyMoveCommand.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\ExecutionEngine.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\ExecutionEngine.obj
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\GameManager.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\GameManager.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\InputManager.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\InputManager.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\main.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\MoveCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\MoveCommand.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\Parser.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\Parser.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\PlayerMoveCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\PlayerMoveCommand.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\ReachableArea.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\ReachableArea.obj
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\Scenario.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\Scenario.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\ScriptLoader.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\ScriptLoader.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\SDLRenderer.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\SDLRenderer.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\ShowMessageCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\ShowMessageCommand.obj

@@ -35,11 +35,19 @@ public:
     void setHighlightTiles(const std::vector<std::pair<int, int>>& tiles);
     void redraw();
 
-    // --- NEW PUBLIC GETTERS ---
-    TileMap* getTileMap()       const { return tileMap; }
-    Cursor* getCursor()        const { return cursor; }
+    // --- PUBLIC GETTERS (Commandクラスからアクセス可能に) ---
+    UIManager* getUI() const { return ui; }
+    InputManager* getInput() const { return input; }
+    TileMap* getTileMap() const { return tileMap; }
+    Cursor* getCursor() const { return cursor; }
     BattleManager* getBattleManager() const { return battleManager; }
-    InputManager* getInput()         const { return input; }
+
+    // waitKeyのラッパー（後方互換性のため）
+    void waitKey() {
+        if (input) {
+            input->waitKey();
+        }
+    }
 
 private:
     UIManager* ui;

@@ -29,11 +29,11 @@ void MoveCommand::execute(ExecutionEngine& engine) {
     auto start = bm->getUnitPosition(unitId_);
     cursor->setPosition(start[0], start[1]);
     engine.redraw();
-    engine.waitKey();
+    engine.waitKey();  // 修正：engine.waitKey()を使用
 
     // 移動→再描画→キー待ち
     bm->moveUnit(unitId_, toPos_[0], toPos_[1]);
     cursor->setPosition(toPos_[0], toPos_[1]);
     engine.redraw();
-    engine.waitKey();
+    engine.waitKey();  // 修正：engine.waitKey()を使用
 }

@@ -142,12 +142,14 @@
     <ClCompile Include="EnemyAttackCommand.cpp" />
     <ClCompile Include="EnemyMoveCommand.cpp" />
     <ClCompile Include="ExecutionEngine.cpp" />
+    <ClCompile Include="GameManager.cpp" />
     <ClCompile Include="InputManager.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoveCommand.cpp" />
     <ClCompile Include="Parser.cpp" />
     <ClCompile Include="PlayerMoveCommand.cpp" />
     <ClCompile Include="ReachableArea.cpp" />
+    <ClCompile Include="Scenario.cpp" />
     <ClCompile Include="ScriptLoader.cpp" />
     <ClCompile Include="SDLRenderer.cpp" />
     <ClCompile Include="ShowMessageCommand.cpp" />
@@ -160,8 +162,10 @@
   <ItemGroup>
     <ClInclude Include="AttackCommand.h" />
     <ClInclude Include="AudioManager.h" />
+    <ClInclude Include="BattleCalculator.h" />
     <ClInclude Include="BattleManager.h" />
     <ClInclude Include="BattleMap.h" />
+    <ClInclude Include="BattleScene.h" />
     <ClInclude Include="BattleStartCommand.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Command.h" />
@@ -170,6 +174,7 @@
     <ClInclude Include="EnemyAttackCommand.h" />
     <ClInclude Include="EnemyMoveCommand.h" />
     <ClInclude Include="ExecutionEngine.h" />
+    <ClInclude Include="GameManager.h" />
     <ClInclude Include="ICommandHandler.h" />
     <ClInclude Include="InputManager.h" />
     <ClInclude Include="IRenderer.h" />
@@ -177,16 +182,22 @@
     <ClInclude Include="Parser.h" />
     <ClInclude Include="PlayerMoveCommand.h" />
     <ClInclude Include="ReachableArea.h" />
+    <ClInclude Include="SaveData.h" />
+    <ClInclude Include="Scenario.h" />
     <ClInclude Include="ScriptLoader.h" />
     <ClInclude Include="SDLRenderer.h" />
     <ClInclude Include="ShowMessageCommand.h" />
     <ClInclude Include="TileMap.h" />
     <ClInclude Include="UIManager.h" />
     <ClInclude Include="Unit.h" />
+    <ClInclude Include="UnitData.h" />
+    <ClInclude Include="UnitDatabase.h" />
     <ClInclude Include="WaitCommand.h" />
     <ClInclude Include="ChoiceCommand.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="data\robots.json" />
+    <None Include="data\scenarios\scenario_01.json.json" />
     <None Include="maps\map01.json" />
     <None Include="maps\map_f01_01.json">
       <DeploymentContent>true</DeploymentContent>

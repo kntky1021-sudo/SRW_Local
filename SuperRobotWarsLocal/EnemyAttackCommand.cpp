@@ -15,8 +15,9 @@ EnemyAttackCommand::EnemyAttackCommand(const nlohmann::json& evt)
 
 void EnemyAttackCommand::execute(ExecutionEngine& engine) {
     auto* bm = engine.getBattleManager();
-    auto* map = engine.tileMap;
+    auto* map = engine.getTileMap();  // 修正：getTileMap()を使用
     auto* cursor = engine.getCursor();
+
     if (!bm || !map || !cursor) {
         std::cerr << "[EnemyAttackCommand] missing dependencies\n";
         return;
@@ -32,11 +33,12 @@ void EnemyAttackCommand::execute(ExecutionEngine& engine) {
     int targetId = -1;
     for (auto const& p : rangeTiles) {
         int id = bm->getUnitAt(p.first, p.second);
-        if (id >= 0) {
+        if (id >= 0 && id != unitId_) {
             targetId = id;
             break;
         }
     }
+
     if (targetId < 0) {
         std::cerr << "[EnemyAttackCommand] no target in range\n";
         return;

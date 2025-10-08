@@ -1,13 +1,9 @@
 #include <SDL.h>
 #include <iostream>
-#include <filesystem>           // C++17 の filesystem
 #include "SDLRenderer.h"
 #include "UIManager.h"
 #include "InputManager.h"
-#include "TileMap.h"
-#include "Cursor.h"
-#include "BattleManager.h"
-#include "ExecutionEngine.h"
+#include "GameManager.h"
 
 int main(int argc, char** argv) {
     // SDL 本体初期化（SDL3 は false が失敗）
@@ -18,12 +14,10 @@ int main(int argc, char** argv) {
 
     constexpr int WINDOW_W = 640;
     constexpr int WINDOW_H = 480;
-    constexpr int TILE_W = 32;
-    constexpr int TILE_H = 32;
 
     // ウィンドウ作成
     SDL_Window* window = SDL_CreateWindow(
-        "SRPG Prototype",
+        "Super Robot Wars - Prototype",
         WINDOW_W,
         WINDOW_H,
         SDL_WINDOW_RESIZABLE
@@ -46,58 +40,26 @@ int main(int argc, char** argv) {
     // SDLRenderer ラッパー
     SDLRenderer sdlRenderer(renderer);
 
-    // TileMap 読み込み(BMP限定)
-    TileMap tileMap(&sdlRenderer, TILE_W, TILE_H);
-    if (!tileMap.loadFromFile("maps/tileset.bmp")) {
-        std::cerr << "[TileMap] loadFromFile failed\n";
-        SDL_DestroyRenderer(renderer);
-        SDL_DestroyWindow(window);
-        SDL_Quit();
-        return -1;
-    }
-
     // 各種マネージャ生成
-    UIManager    uiManager(&sdlRenderer);
+    UIManager uiManager(&sdlRenderer);
     InputManager inputManager;
-    Cursor       cursor(&sdlRenderer, TILE_W, TILE_H);
-    BattleManager battleManager(&sdlRenderer);
 
-    // エンジン組み立て
-    ExecutionEngine engine(
+    // ゲームマネージャー作成
+    GameManager gameManager(
         &uiManager,
         &inputManager,
-        &tileMap,
-        &cursor,
-        &battleManager,
+        &sdlRenderer,
         WINDOW_W,
         WINDOW_H
     );
 
-    // ← ここからデバッグログ追加
-    const std::string scriptPath = "scripts/sample_script.json";
-
-    // カレントディレクトリを出力
-    std::cout << "CWD = "
-        << std::filesystem::current_path().string()
-        << "\n";
-
-    // スクリプト存在チェック
-    if (!std::filesystem::exists(scriptPath)) {
-        std::cerr << "[Error] Script not found: "
-            << scriptPath << "\n";
-    }
-    else {
-        std::cout << "[Info] Found script: "
-            << scriptPath << "\n";
-    }
-    // ← ここまで
-
-    // スクリプト実行
-    engine.run(scriptPath);
+    // ゲーム実行
+    gameManager.run();
 
     // 後始末
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();
+
     return 0;
 }

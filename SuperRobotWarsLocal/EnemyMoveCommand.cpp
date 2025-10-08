@@ -12,7 +12,8 @@ EnemyMoveCommand::EnemyMoveCommand(const nlohmann::json& evt)
 
 void EnemyMoveCommand::execute(ExecutionEngine& engine) {
     auto* bm = engine.getBattleManager();
-    auto* map = engine.tileMap;
+    auto* map = engine.getTileMap();  // 修正：getTileMap()を使用
+
     if (!bm || !map) {
         std::cerr << "[EnemyMoveCommand] missing dependencies\n";
         return;

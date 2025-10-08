@@ -19,6 +19,12 @@
     <Filter Include="scripts">
       <UniqueIdentifier>{20444ca9-e4ff-480e-9d77-e3563e9a0b8f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="data">
+      <UniqueIdentifier>{586dfac3-d15f-465f-8f74-933adb0429c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="data\scenarios">
+      <UniqueIdentifier>{ad28f9bb-676e-492d-a3fd-80dbcc12f4d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -94,6 +100,12 @@
       <Filter>ソース ファイル</Filter>
     </ClCompile>
     <ClCompile Include="EnemyAttackCommand.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Scenario.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="GameManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
@@ -179,6 +191,27 @@
     <ClInclude Include="EnemyAttackCommand.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
+    <ClInclude Include="UnitData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitDatabase.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="BattleCalculator.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="BattleScene.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Scenario.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="SaveData.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="GameManager.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="maps\map_f01_01.json">
@@ -189,6 +222,12 @@
     </None>
     <None Include="maps\map01.json">
       <Filter>maps</Filter>
+    </None>
+    <None Include="data\robots.json">
+      <Filter>data</Filter>
+    </None>
+    <None Include="data\scenarios\scenario_01.json.json">
+      <Filter>data\scenarios</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

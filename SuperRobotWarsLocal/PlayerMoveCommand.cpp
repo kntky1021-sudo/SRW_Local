@@ -16,7 +16,7 @@ PlayerMoveCommand::PlayerMoveCommand(const nlohmann::json& evt)
 void PlayerMoveCommand::execute(ExecutionEngine& engine) {
     auto* cursor = engine.getCursor();
     auto* bm = engine.getBattleManager();
-    auto* map = engine.tileMap;
+    auto* map = engine.getTileMap();  // 修正：getTileMap()を使用
 
     if (!cursor || !bm || !map) {
         std::cerr << "[PlayerMoveCommand] missing dependencies\n";

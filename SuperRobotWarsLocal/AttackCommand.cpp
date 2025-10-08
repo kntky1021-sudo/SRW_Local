@@ -15,12 +15,18 @@ void AttackCommand::execute(ExecutionEngine& engine) {
     BattleManager* bm = engine.getBattleManager();
     TileMap* map = engine.getTileMap();
 
+    if (!cursor || !bm || !map) {
+        std::cerr << "[AttackCommand] missing dependencies\n";
+        return;
+    }
+
     // 2) current cursor position
     int cx = cursor->getX();
     int cy = cursor->getY();
 
-    // 3) compute reachable with four args
-    auto reachable = computeReachable(map, cx, cy, cursor->getMoveRange());
+    // 3) compute reachable with four args (修正: 4引数に変更)
+    const int attackRange = 1;  // 仮の攻撃射程
+    auto reachable = computeReachable(map, cx, cy, attackRange);
 
     // 4) check target is in reachable
     bool canAttack = false;
@@ -30,6 +36,7 @@ void AttackCommand::execute(ExecutionEngine& engine) {
             break;
         }
     }
+
     if (!canAttack) {
         std::cerr << "[AttackCommand] target out of range\n";
     }
@@ -40,5 +47,5 @@ void AttackCommand::execute(ExecutionEngine& engine) {
 
     // 5) redraw & wait
     engine.redraw();
-    engine.getInput()->waitKey();
+    engine.waitKey();
 }

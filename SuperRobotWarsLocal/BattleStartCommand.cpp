@@ -33,14 +33,15 @@ void BattleStartCommand::execute(ExecutionEngine& engine) {
         return;
     }
 
-    // マップ読み込み
-    if (!engine.tileMap->loadFromFile(mapPath_)) {
+    // マップ読み込み（修正：getTileMap()を使用）
+    auto tileMap = engine.getTileMap();
+    if (!tileMap || !tileMap->loadFromFile(mapPath_)) {
         std::cerr << "[TileMap] failed to load: " << mapPath_ << "\n";
         return;
     }
 
     // 初期位置のセット（initPositions_ の中身を BattleManager に反映する等）
-    // …（既存実装）…
+    // TODO: ユニット初期配置の実装
 
     engine.redraw();
     engine.waitKey();
