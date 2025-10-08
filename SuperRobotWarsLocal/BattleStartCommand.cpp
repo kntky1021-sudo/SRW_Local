@@ -34,7 +34,7 @@ void BattleStartCommand::execute(ExecutionEngine& engine) {
     }
 
     // マップ読み込み
-    if (!engine.tileMap->load(mapPath_)) {
+    if (!engine.tileMap->loadFromFile(mapPath_)) {
         std::cerr << "[TileMap] failed to load: " << mapPath_ << "\n";
         return;
     }

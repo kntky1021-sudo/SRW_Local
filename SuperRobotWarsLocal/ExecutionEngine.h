@@ -4,7 +4,6 @@
 #include <vector>
 #include <memory>
 #include <utility>
-
 #include "UIManager.h"
 #include "InputManager.h"
 #include "TileMap.h"
@@ -13,46 +12,46 @@
 #include "Camera.h"
 #include "Command.h"
 
+enum class Phase {
+    Script,
+    PlayerMove,
+    PlayerAttack,
+    EnemyMove,
+    EnemyAttack
+};
+
 class ExecutionEngine {
 public:
-    enum class Phase {
-        Script,
-        PlayerMove,
-        PlayerAttack,
-        EnemyMove,
-        EnemyAttack
-    };
-
-    ExecutionEngine(UIManager* uiMgr,
+    ExecutionEngine(
+        UIManager* uiMgr,
         InputManager* inputMgr,
-        TileMap* tileMap,
-        Cursor* cursor,
+        TileMap* tileMap_,
+        Cursor* cursor_,
         BattleManager* battleMgr,
-        int windowW,
-        int windowH);
+        int            windowW,
+        int            windowH);
 
-    void run(const std::string& scriptPath = "script.json");
-    void redraw();
+    void run(const std::string& scriptPath);
     void setHighlightTiles(const std::vector<std::pair<int, int>>& tiles);
+    void redraw();
 
-    // 実行中のコマンドが参照できるように
-    Phase getCurrentPhase() const { return currentPhase_; }
-    Cursor* getCursor() const { return cursor; }
+    // --- NEW PUBLIC GETTERS ---
+    TileMap* getTileMap()       const { return tileMap; }
+    Cursor* getCursor()        const { return cursor; }
     BattleManager* getBattleManager() const { return battleManager; }
-    void waitKey() { if (input) input->waitKey(); }
+    InputManager* getInput()         const { return input; }
 
+private:
     UIManager* ui;
     InputManager* input;
     TileMap* tileMap;
     Cursor* cursor;
     BattleManager* battleManager;
 
-private:
     std::vector<std::unique_ptr<Command>> commands_;
-    // コマンドごとのフェイズを同じ順序で保持
-    std::vector<Phase>                   commandPhases_;
-    std::size_t    currentIndex_;
-    Camera         camera_;
-    std::vector<std::pair<int, int>> highlightTiles_;
-    Phase          currentPhase_;
+    std::vector<Phase>                    commandPhases_;
+    size_t                                currentIndex_;
+    Camera                                camera_;
+    Phase                                 currentPhase_;
+    std::vector<std::pair<int, int>>       highlightTiles_;
 };

@@ -5,7 +5,7 @@
 
 class TileMap;
 
-/// @brief マップ上の到達可能範囲を計算する (未実装 stub)
+/// @brief now takes four args
 std::vector<std::pair<int, int>>
 computeReachable(TileMap* map,
     int startX,
