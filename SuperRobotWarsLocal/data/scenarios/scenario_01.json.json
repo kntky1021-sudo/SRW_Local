@@ -1,0 +1,77 @@
+{
+  "id": "stage_01",
+  "title": "第1話：出撃！スーパーロボット",
+  "mapFile": "maps/tileset.bmp",
+  "maxTurns": 10,
+  "victoryType": "DestroyAllEnemies",
+  "victoryTargetId": "",
+  "victoryValue": 0,
+  "defeatType": "MainUnitDestroyed",
+  "defeatTargetId": "player_gundam",
+  "defeatValue": 0,
+  "initialUnits": [
+    {
+      "unitId": "player_gundam",
+      "robotId": "gundam_rx78",
+      "pilotId": "amuro_ray",
+      "x": 2,
+      "y": 2,
+      "isEnemy": false
+    },
+    {
+      "unitId": "player_mazinger",
+      "robotId": "mazinger_z",
+      "pilotId": "kouji_kabuto",
+      "x": 3,
+      "y": 2,
+      "isEnemy": false
+    },
+    {
+      "unitId": "enemy_zaku_1",
+      "robotId": "zaku_ii",
+      "pilotId": "zaku_pilot",
+      "x": 8,
+      "y": 5,
+      "isEnemy": true
+    },
+    {
+      "unitId": "enemy_zaku_2",
+      "robotId": "zaku_ii",
+      "pilotId": "zaku_pilot",
+      "x": 9,
+      "y": 4,
+      "isEnemy": true
+    },
+    {
+      "unitId": "enemy_zaku_3",
+      "robotId": "zaku_ii",
+      "pilotId": "zaku_pilot",
+      "x": 9,
+      "y": 6,
+      "isEnemy": true
+    }
+  ],
+  "events": [
+    {
+      "trigger": "TurnStart",
+      "turnNumber": 1,
+      "dialogFile": "dialogs/stage01_start.json",
+      "reinforcements": []
+    },
+    {
+      "trigger": "TurnStart",
+      "turnNumber": 3,
+      "dialogFile": "",
+      "reinforcements": ["enemy_zaku_4"]
+    },
+    {
+      "trigger": "UnitDestroyed",
+      "unitId": "enemy_zaku_1",
+      "dialogFile": "dialogs/stage01_first_kill.json",
+      "reinforcements": []
+    }
+  ],
+  "preBattleDialog": "dialogs/stage01_pre.json",
+  "postBattleDialog": "dialogs/stage01_post.json",
+  "nextScenario": "scenario_02.json"
+}

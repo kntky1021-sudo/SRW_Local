@@ -1,0 +1,204 @@
+[
+  {
+    "id": "gundam_rx78",
+    "name": "ガンダム",
+    "series": "機動戦士ガンダム",
+    "maxHp": 4500,
+    "maxEn": 180,
+    "armor": 1200,
+    "mobility": 115,
+    "moveRange": 6,
+    "movementType": "L",
+    "terrainLand": "A",
+    "terrainSea": "B",
+    "terrainAir": "B",
+    "terrainSpace": "A",
+    "size": "M",
+    "weapons": [
+      {
+        "name": "バルカン砲",
+        "power": 800,
+        "minRange": 1,
+        "maxRange": 3,
+        "ammo": 30,
+        "enCost": 0,
+        "isMap": false,
+        "attribute": "実弾"
+      },
+      {
+        "name": "ビームライフル",
+        "power": 2200,
+        "minRange": 2,
+        "maxRange": 5,
+        "ammo": 8,
+        "enCost": 10,
+        "isMap": false,
+        "attribute": "ビーム"
+      },
+      {
+        "name": "ビームサーベル",
+        "power": 2800,
+        "minRange": 1,
+        "maxRange": 1,
+        "ammo": -1,
+        "enCost": 15,
+        "isMap": false,
+        "attribute": "ビーム"
+      },
+      {
+        "name": "ハイパーバズーカ",
+        "power": 2600,
+        "minRange": 2,
+        "maxRange": 4,
+        "ammo": 6,
+        "enCost": 5,
+        "isMap": false,
+        "attribute": "実弾"
+      }
+    ]
+  },
+  {
+    "id": "mazinger_z",
+    "name": "マジンガーZ",
+    "series": "マジンガーZ",
+    "maxHp": 5000,
+    "maxEn": 150,
+    "armor": 1400,
+    "mobility": 90,
+    "moveRange": 5,
+    "movementType": "L",
+    "terrainLand": "A",
+    "terrainSea": "C",
+    "terrainAir": "B",
+    "terrainSpace": "C",
+    "size": "M",
+    "weapons": [
+      {
+        "name": "ロケットパンチ",
+        "power": 1800,
+        "minRange": 2,
+        "maxRange": 4,
+        "ammo": 4,
+        "enCost": 0,
+        "isMap": false,
+        "attribute": "実弾"
+      },
+      {
+        "name": "光子力ビーム",
+        "power": 2400,
+        "minRange": 1,
+        "maxRange": 3,
+        "ammo": -1,
+        "enCost": 20,
+        "isMap": false,
+        "attribute": "ビーム"
+      },
+      {
+        "name": "ブレストファイヤー",
+        "power": 3000,
+        "minRange": 1,
+        "maxRange": 5,
+        "ammo": -1,
+        "enCost": 30,
+        "isMap": false,
+        "attribute": "特殊"
+      },
+      {
+        "name": "鉄拳ロケットパンチ",
+        "power": 3200,
+        "minRange": 1,
+        "maxRange": 1,
+        "ammo": -1,
+        "enCost": 10,
+        "isMap": false,
+        "attribute": "格闘"
+      }
+    ]
+  },
+  {
+    "id": "getter_robo",
+    "name": "ゲッターロボ",
+    "series": "ゲッターロボ",
+    "maxHp": 4800,
+    "maxEn": 160,
+    "armor": 1300,
+    "mobility": 110,
+    "moveRange": 6,
+    "movementType": "A",
+    "terrainLand": "A",
+    "terrainSea": "B",
+    "terrainAir": "A",
+    "terrainSpace": "B",
+    "size": "M",
+    "weapons": [
+      {
+        "name": "ゲッタートマホーク",
+        "power": 1600,
+        "minRange": 1,
+        "maxRange": 1,
+        "ammo": -1,
+        "enCost": 5,
+        "isMap": false,
+        "attribute": "格闘"
+      },
+      {
+        "name": "ゲッタービーム",
+        "power": 2500,
+        "minRange": 2,
+        "maxRange": 6,
+        "ammo": -1,
+        "enCost": 25,
+        "isMap": false,
+        "attribute": "ビーム"
+      },
+      {
+        "name": "ゲッタートマホーク投げ",
+        "power": 2000,
+        "minRange": 2,
+        "maxRange": 4,
+        "ammo": 3,
+        "enCost": 0,
+        "isMap": false,
+        "attribute": "実弾"
+      }
+    ]
+  },
+  {
+    "id": "zaku_ii",
+    "name": "ザクII",
+    "series": "機動戦士ガンダム",
+    "maxHp": 3200,
+    "maxEn": 120,
+    "armor": 900,
+    "mobility": 95,
+    "moveRange": 5,
+    "movementType": "L",
+    "terrainLand": "B",
+    "terrainSea": "C",
+    "terrainAir": "C",
+    "terrainSpace": "A",
+    "size": "M",
+    "weapons": [
+      {
+        "name": "ザクマシンガン",
+        "power": 1200,
+        "minRange": 2,
+        "maxRange": 4,
+        "ammo": 20,
+        "enCost": 0,
+        "isMap": false,
+        "attribute": "実弾"
+      },
+      {
+        "name": "ヒートホーク",
+        "power": 1600,
+        "minRange": 1,
+        "maxRange": 1,
+        "ammo": -1,
+        "enCost": 5,
+        "isMap": false,
+        "attribute": "格闘"
+      }
+    ]
+  }
+]

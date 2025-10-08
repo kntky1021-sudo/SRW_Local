@@ -1,0 +1,92 @@
+[
+  {
+    "id": "amuro_ray",
+    "name": "アムロ・レイ",
+    "series": "機動戦士ガンダム",
+    "fighting": 120,
+    "shooting": 150,
+    "defense": 130,
+    "skill": 140,
+    "reaction": 145,
+    "spirits": [
+      "集中",
+      "ひらめき",
+      "加速",
+      "覚醒"
+    ],
+    "abilities": [
+      "ニュータイプ"
+    ]
+  },
+  {
+    "id": "kouji_kabuto",
+    "name": "兜甲児",
+    "series": "マジンガーZ",
+    "fighting": 140,
+    "shooting": 110,
+    "defense": 120,
+    "skill": 115,
+    "reaction": 125,
+    "spirits": [
+      "気合",
+      "根性",
+      "熱血",
+      "魂"
+    ],
+    "abilities": [
+      "底力"
+    ]
+  },
+  {
+    "id": "ryoma_nagare",
+    "name": "流竜馬",
+    "series": "ゲッターロボ",
+    "fighting": 145,
+    "shooting": 105,
+    "defense": 125,
+    "skill": 120,
+    "reaction": 130,
+    "spirits": [
+      "気合",
+      "必中",
+      "熱血",
+      "友情"
+    ],
+    "abilities": [
+      "底力",
+      "切り払い"
+    ]
+  },
+  {
+    "id": "zaku_pilot",
+    "name": "ザク兵",
+    "series": "機動戦士ガンダム",
+    "fighting": 80,
+    "shooting": 85,
+    "defense": 75,
+    "skill": 70,
+    "reaction": 75,
+    "spirits": [],
+    "abilities": []
+  },
+  {
+    "id": "char_aznable",
+    "name": "シャア・アズナブル",
+    "series": "機動戦士ガンダム",
+    "fighting": 130,
+    "shooting": 135,
+    "defense": 125,
+    "skill": 140,
+    "reaction": 150,
+    "spirits": [
+      "集中",
+      "ひらめき",
+      "加速",
+      "突撃"
+    ],
+    "abilities": [
+      "ニュータイプ",
+      "指揮官"
+    ]
+  }
+]
