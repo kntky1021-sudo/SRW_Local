@@ -1,6 +1,10 @@
 #include "GameManager.h"
 #include <SDL.h>
 #include <iostream>
+#include "BattleScene.h"
+#include "Unit.h"          // ← 追加
+#include "WeaponSelectUI.h"
+#include "UnitData.h"
 
 GameManager::GameManager(
     UIManager* ui,
@@ -647,9 +651,62 @@ void GameManager::handleMenuInput() {
 
 void GameManager::selectAttack() {
     isShowingMenu_ = false;
-    isSelectingAttackTarget_ = true;
 
-    std::cout << "[GameManager] === Select Attack Target ===\n";
+    // 武器選択UI作成
+    WeaponSelectUI weaponUI(renderer_, ui_);
+
+    // テスト用武器リスト作成
+    std::vector<WeaponData> weapons;
+
+    // テスト武器1
+    WeaponData weapon1;
+    weapon1.name = "Beam Rifle";
+    weapon1.power = 2000;
+    weapon1.minRange = 2;
+    weapon1.maxRange = 5;
+    weapon1.ammo = 8;
+    weapon1.enCost = 10;
+    weapon1.isMap = false;
+    weapon1.attribute = "Beam";
+    weapons.push_back(weapon1);
+
+    // テスト武器2
+    WeaponData weapon2;
+    weapon2.name = "Beam Saber";
+    weapon2.power = 2800;
+    weapon2.minRange = 1;
+    weapon2.maxRange = 1;
+    weapon2.ammo = -1;  // 無限
+    weapon2.enCost = 15;
+    weapon2.isMap = false;
+    weapon2.attribute = "Melee";
+    weapons.push_back(weapon2);
+
+    // テスト武器3
+    WeaponData weapon3;
+    weapon3.name = "Vulcan";
+    weapon3.power = 800;
+    weapon3.minRange = 1;
+    weapon3.maxRange = 3;
+    weapon3.ammo = 30;
+    weapon3.enCost = 0;
+    weapon3.isMap = false;
+    weapon3.attribute = "Physical";
+    weapons.push_back(weapon3);
+
+    // 武器選択（EN=100、距離=1と仮定）
+    int weaponIndex = weaponUI.selectWeapon(weapons, 100, 1);
+
+    if (weaponIndex < 0) {
+        // キャンセル→メニューに戻る
+        showUnitMenu();
+        return;
+    }
+
+    std::cout << "[GameManager] Selected weapon: " << weapons[weaponIndex].name << "\n";
+
+    // 攻撃対象選択へ
+    isSelectingAttackTarget_ = true;
 
     // 攻撃可能範囲を計算（周囲1マス）
     auto pos = battleManager_->getUnitPosition(selectedUnitId_);
@@ -787,19 +844,100 @@ void GameManager::executeAttack(int targetId) {
     std::cout << "[GameManager] " << battleManager_->getUnitName(selectedUnitId_)
         << " attacks " << battleManager_->getUnitName(targetId) << "!\n";
 
-    // 攻撃実行
-    battleManager_->attack(attackerPos[0], attackerPos[1],
-        defenderPos[0], defenderPos[1]);
+    // 簡易ユニットオブジェクトの作成（仮実装）
+    // TODO: 将来的にはBattleManagerから完全なUnitオブジェクトを取得
+    Unit attackerUnit(
+        battleManager_->getUnitName(selectedUnitId_),
+        Team::Ally,
+        'P',
+        battleManager_->getUnitMaxHP(selectedUnitId_),
+        5,  // moveRange
+        1,  // attackRange
+        100,  // attackPower
+        50,  // defensePower
+        100   // speed
+    );
+    attackerUnit.setPosition(attackerPos[0], attackerPos[1]);
+    // 現在のHPを設定（簡易版）
+    int currentHp = battleManager_->getUnitHP(selectedUnitId_);
+    int maxHp = battleManager_->getUnitMaxHP(selectedUnitId_);
+    if (currentHp < maxHp) {
+        attackerUnit.takeDamage(maxHp - currentHp);
+    }
+
+    Unit defenderUnit(
+        battleManager_->getUnitName(targetId),
+        Team::Enemy,
+        'E',
+        battleManager_->getUnitMaxHP(targetId),
+        5,
+        1,
+        50,
+        30,
+        80
+    );
+    defenderUnit.setPosition(defenderPos[0], defenderPos[1]);
+    currentHp = battleManager_->getUnitHP(targetId);
+    maxHp = battleManager_->getUnitMaxHP(targetId);
+    if (currentHp < maxHp) {
+        defenderUnit.takeDamage(maxHp - currentHp);
+    }
+
+    // BattleSceneで戦闘実行
+    BattleScene battleScene(ui_, renderer_);
+    BattleResult result = battleScene.performBattle(
+        &attackerUnit,
+        &defenderUnit,
+        nullptr,  // 武器は後で実装
+        'L'       // 地形
+    );
+
+    // 結果をBattleManagerに反映
+    battleManager_->applyDamage(targetId, result.damage);
+
+    // 経験値付与
+    battleManager_->addExperience(selectedUnitId_, result.expGained);
 
     // 選択をリセット
     selectedUnitId_ = -1;
 
-    // メッセージ表示（簡易版）
-    SDL_Delay(1000);
+    // 元の画面に戻る
+    render();
+    SDL_Delay(500);
 
     // 攻撃後に勝利条件チェック
     if (checkVictoryCondition()) {
         std::cout << "[GameManager] Victory achieved after attack!\n";
         state_ = GameState::BattleResult;
     }
+}
+
+// 戦闘アニメーション用の補助メソッド（空実装）
+void GameManager::playBattleAnimation(int attackerId, int defenderId) {
+    // TODO: 
+    // 1. 戦闘画面への切り替え
+    // 2. ユニットグラフィックの表示
+    // 3. 攻撃アニメーション
+    // 4. ダメージエフェクト
+    // 5. 元の画面に戻る
+    std::cout << "[GameManager] Battle animation (not implemented)\n";
+}
+
+// 戦闘結果の表示（空実装）
+void GameManager::showBattleResultDialog(const BattleResult& result) {
+    std::stringstream ss;
+    ss << "与ダメージ: " << result.damage;
+
+    if (result.isCritical) {
+        ss << " (クリティカル!)";
+    }
+
+    ss << "\n経験値: +" << result.expGained;
+
+    if (result.defenderDestroyed) {
+        ss << "\n敵機撃破！";
+    }
+
+    ui_->showMessage(ss.str());
+    SDL_Delay(2000);
 }

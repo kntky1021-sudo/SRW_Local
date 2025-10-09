@@ -22,6 +22,8 @@ Unit::Unit(std::string id_,
     , speed(speed_)
     , x(0)
     , y(0)
+    , currentEN_(100)  // 追加
+    , maxEN_(100)      // 追加
 {
 }
 
@@ -47,4 +49,86 @@ bool               Unit::isAlive() const { return hp > 0; }
 void Unit::takeDamage(int dmg) {
     hp -= dmg;
     if (hp < 0) hp = 0;
+}
+
+void Unit::addWeapon(const WeaponData& weapon) {
+    weapons_.push_back(weapon);
+}
+
+const WeaponData* Unit::getWeapon(int index) const {
+    if (index >= 0 && index < static_cast<int>(weapons_.size())) {
+        return &weapons_[index];
+    }
+    return nullptr;
+}
+
+void Unit::consumeAmmo(int weaponIndex) {
+    if (weaponIndex >= 0 && weaponIndex < static_cast<int>(weapons_.size())) {
+        if (weapons_[weaponIndex].ammo > 0) {
+            weapons_[weaponIndex].ammo--;
+        }
+    }
+}
+
+void Unit::consumeEN(int amount) {
+    currentEN_ -= amount;
+    if (currentEN_ < 0) currentEN_ = 0;
+}
+
+void Unit::setEN(int current, int max) {
+    currentEN_ = current;
+    maxEN_ = max;
+}
+
+void Unit::recoverEN(int amount) {
+    currentEN_ += amount;
+    if (currentEN_ > maxEN_) {
+        currentEN_ = maxEN_;
+    }
+}
+
+// パイロット能力値取得（新規追加）
+int Unit::getPilotFighting() const {
+    return pilotData_ ? pilotData_->fighting : 100;
+}
+
+int Unit::getPilotShooting() const {
+    return pilotData_ ? pilotData_->shooting : 100;
+}
+
+int Unit::getPilotDefense() const {
+    return pilotData_ ? pilotData_->defense : 100;
+}
+
+int Unit::getPilotSkill() const {
+    return pilotData_ ? pilotData_->skill : 100;
+}
+
+int Unit::getPilotReaction() const {
+    return pilotData_ ? pilotData_->reaction : 100;
+}
+
+// 機体性能取得（新規追加）
+int Unit::getArmor() const {
+    return robotData_ ? robotData_->armor : defensePower;
+}
+
+int Unit::getMobility() const {
+    return robotData_ ? robotData_->mobility : speed;
+}
+
+char Unit::getSize() const {
+    return robotData_ ? robotData_->size : 'M';
+}
+
+char Unit::getTerrainAdaptation(char terrain) const {
+    if (!robotData_) return 'B';
+
+    switch (terrain) {
+    case 'L': return robotData_->terrainLand;
+    case 'S': return robotData_->terrainSea;
+    case 'A': return robotData_->terrainAir;
+    case 'W': return robotData_->terrainSpace;
+    default:  return 'B';
+    }
 }

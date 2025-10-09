@@ -1,0 +1,206 @@
+#include "BattleScene.h"
+#include "UIManager.h"
+#include "SDLRenderer.h"
+#include "Unit.h"
+#include "UnitData.h"
+#include "BattleCalculator.h"
+#include "BattleUIManager.h"
+#include <SDL.h>
+#include <iostream>
+#include <sstream>
+#include "TextureManager.h"
+
+BattleScene::BattleScene(UIManager* ui, SDLRenderer* renderer)
+    : ui_(ui)
+    , renderer_(renderer)
+{
+}
+
+BattleResult BattleScene::performBattle(
+    Unit* attacker,
+    Unit* defender,
+    Weapon* weapon,
+    char terrain)
+{
+    if (!attacker || !defender) {
+        std::cerr << "[BattleScene] Invalid parameters\n";
+        return BattleResult{};
+    }
+
+    std::cout << "[BattleScene] Starting battle...\n";
+
+    // TextureManager作成と画像読み込み
+    TextureManager texMgr(renderer_);
+
+    // テスト用画像を読み込み（実際の画像パスに後で変更）
+    std::string attackerTexId = "unit_" + attacker->getId();
+    std::string defenderTexId = "unit_" + defender->getId();
+
+    // 味方・敵それぞれのテスト画像を読み込み
+    // TODO: 実際のユニットIDに基づいた画像パスに変更
+    texMgr.loadTexture(attackerTexId, "assets/units/test_ally.bmp");
+    texMgr.loadTexture(defenderTexId, "assets/units/test_enemy.bmp");
+
+    // BattleUIManager作成
+    BattleUIManager battleUI(renderer_, ui_);
+    battleUI.setTextureManager(&texMgr);
+
+    // 1) 戦闘前プレビュー表示
+    int hitRate = BattleCalculator::calculateHitRate(attacker, defender, weapon, terrain);
+    int critRate = BattleCalculator::calculateCriticalRate(attacker, weapon);
+
+    battleUI.showBattlePreview(attacker, defender, hitRate, critRate);
+
+    // キー入力待ち
+    SDL_Event e;
+    bool waiting = true;
+    while (waiting) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_QUIT) {
+                waiting = false;
+                break;
+            }
+        }
+        SDL_Delay(16);
+    }
+
+    // 2) 戦闘デモ初期化と表示
+    battleUI.initBattleDemo(attacker, defender);
+    battleUI.renderBattleDemo();
+    SDL_Delay(1500);
+
+    // 3) 戦闘計算実行
+    BattleResult result = BattleCalculator::execute(attacker, defender, weapon, terrain);
+
+    // 4) 攻撃アニメーション
+    battleUI.playAttackAnimation(true);
+    battleUI.renderBattleDemo();  // デモ画面を再描画
+    SDL_Delay(800);
+
+    // 5) ダメージ表示
+    battleUI.showDamage(result.damage, result.isCritical, result.damage == 0);
+
+    // キー入力待ち
+    waiting = true;
+    while (waiting) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_QUIT) {
+                waiting = false;
+                break;
+            }
+        }
+        SDL_Delay(16);
+    }
+
+    // ダメージ適用
+    if (result.damage > 0) {
+        defender->takeDamage(result.damage);
+    }
+
+    // 6) 反撃処理（将来実装）
+    if (result.isCountered) {
+        std::cout << "[BattleScene] Counter attack!\n";
+        // TODO: 反撃アニメーション
+    }
+
+    // 7) 戦闘結果表示
+    battleUI.showBattleResult(result, attacker->getId(), defender->getId());
+
+    // キー入力待ち
+    waiting = true;
+    while (waiting) {
+        while (SDL_PollEvent(&e)) {
+            if (e.type == SDL_EVENT_KEY_DOWN || e.type == SDL_EVENT_QUIT) {
+                waiting = false;
+                break;
+            }
+        }
+        SDL_Delay(16);
+    }
+
+    // TextureManagerは自動的にデストラクタで解放される
+
+    return result;
+}
+
+void BattleScene::showBattlePreview(
+    const Unit* attacker,
+    const Unit* defender,
+    const Weapon* weapon,
+    int hitRate)
+{
+    std::stringstream ss;
+    ss << "=== 戦闘開始 ===\n";
+    ss << attacker->getId() << " → " << defender->getId() << "\n";
+    ss << "命中率: " << hitRate << "%\n";
+
+    if (weapon) {
+        // 将来: 武器名を表示
+        ss << "武器: (仮)\n";
+    }
+
+    ss << "\nHP: " << attacker->getHp() << " vs " << defender->getHp();
+
+    ui_->showMessage(ss.str());
+}
+
+void BattleScene::playAttackAnimation(
+    const Unit* attacker,
+    const Weapon* weapon)
+{
+    std::stringstream ss;
+    ss << attacker->getId() << " の攻撃！";
+
+    ui_->showMessage(ss.str());
+
+    // TODO: 実際のアニメーション処理
+    // - スプライトの表示
+    // - エフェクトの再生
+    // - 効果音の再生
+}
+
+void BattleScene::showDamage(
+    const Unit* target,
+    int damage,
+    bool isCritical)
+{
+    std::stringstream ss;
+
+    if (isCritical) {
+        ss << "★ クリティカルヒット！ ★\n";
+    }
+
+    ss << target->getId() << " に " << damage << " のダメージ！\n";
+
+    int hpAfter = target->getHp() - damage;
+    if (hpAfter < 0) hpAfter = 0;
+
+    ss << "HP: " << target->getHp() << " → " << hpAfter;
+
+    ui_->showMessage(ss.str());
+}
+
+void BattleScene::showBattleResult(
+    const BattleResult& result,
+    const Unit* attacker,
+    const Unit* defender)
+{
+    std::stringstream ss;
+    ss << "=== 戦闘結果 ===\n";
+
+    if (result.defenderDestroyed) {
+        ss << defender->getId() << " を撃破！\n";
+    }
+
+    ss << "経験値: +" << result.expGained << "\n";
+
+    // 反撃結果（将来実装）
+    if (result.isCountered) {
+        ss << "\n反撃ダメージ: " << result.counterDamage << "\n";
+        if (result.attackerDestroyed) {
+            ss << attacker->getId() << " が撃破された！\n";
+        }
+    }
+
+    ui_->showMessage(ss.str());
+}

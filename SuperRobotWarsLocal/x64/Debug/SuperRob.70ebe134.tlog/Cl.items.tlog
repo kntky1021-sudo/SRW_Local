@@ -1,7 +1,10 @@
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AttackCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\AttackCommand.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\AudioManager.obj
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\BattleCalculator.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\BattleCalculator.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\BattleManager.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\BattleManager.obj
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\BattleScene.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\BattleScene.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\BattleStartCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\BattleStartCommand.obj
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\BattleUIManager.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\BattleUIManager.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\Camera.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\Camera.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\ChoiceCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\ChoiceCommand.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\CommandFactory.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\CommandFactory.obj
@@ -21,7 +24,10 @@ C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\ScriptLoader
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\SDLRenderer.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\SDLRenderer.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\ShowMessageCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\ShowMessageCommand.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\BattleMap.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\BattleMap.obj
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\TextureManager.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\TextureManager.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\TileMap.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\TileMap.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\UIManagerSDL.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\UIManagerSDL.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\Unit.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\Unit.obj
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\UnitDatabase.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\UnitDatabase.obj
 C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\WaitCommand.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\WaitCommand.obj
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\WeaponSelectUI.cpp;C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\x64\Debug\WeaponSelectUI.obj

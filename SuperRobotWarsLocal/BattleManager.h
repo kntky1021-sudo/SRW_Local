@@ -5,6 +5,9 @@
 #include <string>
 #include "SDLRenderer.h"
 
+// 前方宣言
+class UIManager;
+
 class BattleManager {
 public:
     explicit BattleManager(SDLRenderer* renderer);
@@ -35,22 +38,6 @@ public:
     // 攻撃者(attackerX, attackerY)から防御側(defenderX, defenderY)へ攻撃
     void attack(int attackerX, int attackerY, int defenderX, int defenderY);
 
-private:
-    SDLRenderer* renderer_;
-
-    // 簡易ユニット構造体
-    struct Unit {
-        int x = 0;
-        int y = 0;
-        int hp = 100;
-        bool isEnemy = false;     // 敵ユニットか
-        bool hasActed = false;    // 行動済みか
-        std::string name = "Unit"; // ユニット名
-    };
-
-    std::vector<Unit> units_;
-
-public:
     // ユニット追加
     int addUnit(int x, int y, bool isEnemy, const std::string& name = "Unit");
 
@@ -67,4 +54,27 @@ public:
     // 敵味方の生存数取得
     int getAliveAllyCount() const;
     int getAliveEnemyCount() const;
+
+    // 拡張: ユニット情報取得
+    int getUnitHP(int unitId) const;
+    int getUnitMaxHP(int unitId) const;
+
+    // 経験値・レベル管理
+    void addExperience(int unitId, int exp);
+    bool checkLevelUp(int unitId);
+
+private:
+    SDLRenderer* renderer_;
+
+    // 簡易ユニット構造体
+    struct Unit {
+        int x = 0;
+        int y = 0;
+        int hp = 100;
+        bool isEnemy = false;     // 敵ユニットか
+        bool hasActed = false;    // 行動済みか
+        std::string name = "Unit"; // ユニット名
+    };
+
+    std::vector<Unit> units_;
 };

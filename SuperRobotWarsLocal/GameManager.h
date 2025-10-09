@@ -11,6 +11,8 @@
 #include "InputManager.h"
 #include "SDLRenderer.h"
 #include "Camera.h"
+#include "BattleCalculator.h"  // これをファイル先頭のインクルード部分に追加
+#include <sstream>  // これもファイル先頭に追加
 
 /// ゲーム全体の状態
 enum class GameState {
@@ -104,4 +106,6 @@ private:
     // 勝敗判定
     bool checkVictoryCondition();
     bool checkDefeatCondition();
+    void playBattleAnimation(int attackerId, int defenderId);
+    void showBattleResultDialog(const BattleResult& result);
 };

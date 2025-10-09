@@ -1,4 +1,7 @@
-﻿  GameManager.cpp
-  main.cpp
+﻿  Unit.cpp
+  UnitDatabase.cpp
+  WeaponSelectUI.cpp
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\WeaponSelectUI.cpp(199,32): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\WeaponSelectUI.cpp(199,29): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
   コードを生成中...
   SuperRobotWarsLocal.vcxproj -> C:\Users\kntky\source\repos\SuperRobotWarsLocal\x64\Debug\SuperRobotWarsLocal.exe

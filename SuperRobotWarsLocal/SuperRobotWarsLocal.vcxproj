@@ -133,8 +133,11 @@
   <ItemGroup>
     <ClCompile Include="AttackCommand.cpp" />
     <ClCompile Include="AudioManager.cpp" />
+    <ClCompile Include="BattleCalculator.cpp" />
     <ClCompile Include="BattleManager.cpp" />
+    <ClCompile Include="BattleScene.cpp" />
     <ClCompile Include="BattleStartCommand.cpp" />
+    <ClCompile Include="BattleUIManager.cpp" />
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="ChoiceCommand.cpp" />
     <ClCompile Include="CommandFactory.cpp" />
@@ -154,10 +157,13 @@
     <ClCompile Include="SDLRenderer.cpp" />
     <ClCompile Include="ShowMessageCommand.cpp" />
     <ClCompile Include="BattleMap.cpp" />
+    <ClCompile Include="TextureManager.cpp" />
     <ClCompile Include="TileMap.cpp" />
     <ClCompile Include="UIManagerSDL.cpp" />
     <ClCompile Include="Unit.cpp" />
+    <ClCompile Include="UnitDatabase.cpp" />
     <ClCompile Include="WaitCommand.cpp" />
+    <ClCompile Include="WeaponSelectUI.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AttackCommand.h" />
@@ -167,6 +173,7 @@
     <ClInclude Include="BattleMap.h" />
     <ClInclude Include="BattleScene.h" />
     <ClInclude Include="BattleStartCommand.h" />
+    <ClInclude Include="BattleUIManager.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Command.h" />
     <ClInclude Include="CommandFactory.h" />
@@ -187,6 +194,7 @@
     <ClInclude Include="ScriptLoader.h" />
     <ClInclude Include="SDLRenderer.h" />
     <ClInclude Include="ShowMessageCommand.h" />
+    <ClInclude Include="TextureManager.h" />
     <ClInclude Include="TileMap.h" />
     <ClInclude Include="UIManager.h" />
     <ClInclude Include="Unit.h" />
@@ -194,6 +202,7 @@
     <ClInclude Include="UnitDatabase.h" />
     <ClInclude Include="WaitCommand.h" />
     <ClInclude Include="ChoiceCommand.h" />
+    <ClInclude Include="WeaponSelectUI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="data\robots.json" />

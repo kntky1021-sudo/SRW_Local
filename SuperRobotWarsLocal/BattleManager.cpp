@@ -103,7 +103,6 @@ void BattleManager::applyDamage(int unitId, int damage) {
     }
 }
 
-// 攻撃実行メソッド
 void BattleManager::attack(int attackerX, int attackerY, int defenderX, int defenderY) {
     int attackerId = getUnitAt(attackerX, attackerY);
     int defenderId = getUnitAt(defenderX, defenderY);
@@ -118,13 +117,27 @@ void BattleManager::attack(int attackerX, int attackerY, int defenderX, int defe
         return;
     }
 
-    // ダメージ計算と適用
+    std::cout << "[BattleManager] Battle: Unit " << attackerId
+        << " vs Unit " << defenderId << "\n";
+
+    // 実際の戦闘システムを使用する場合は、
+    // UnitDatabaseから取得したユニット情報を使用
+    // 今は簡易版として既存のダメージ計算を使用
+
     int damage = calculateDamage(attackerId, defenderId);
     applyDamage(defenderId, damage);
 
     std::cout << "[BattleManager] Unit " << units_[attackerId].name
         << " attacked Unit " << units_[defenderId].name
         << " for " << damage << " damage\n";
+
+    // 撃破時の処理
+    if (units_[defenderId].hp <= 0) {
+        std::cout << "[BattleManager] Unit " << units_[defenderId].name
+            << " has been destroyed!\n";
+        // TODO: 経験値付与
+        // TODO: 撃破カウント増加
+    }
 }
 
 // ユニット追加
@@ -206,4 +219,37 @@ int BattleManager::getAliveEnemyCount() const {
         }
     }
     return count;
+}
+
+
+// BattleManager.cpp の末尾に以下のメソッドを追加：
+
+// ユニット情報取得の拡張
+int BattleManager::getUnitHP(int unitId) const {
+    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
+        return units_[unitId].hp;
+    }
+    return 0;
+}
+
+int BattleManager::getUnitMaxHP(int unitId) const {
+    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
+        // 現状は固定値、後でロボットデータから取得
+        return units_[unitId].isEnemy ? 100 : 1000;
+    }
+    return 0;
+}
+
+// ユニットの経験値・レベル管理
+void BattleManager::addExperience(int unitId, int exp) {
+    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
+        // TODO: 経験値システムの実装
+        std::cout << "[BattleManager] Unit " << unitId
+            << " gained " << exp << " exp\n";
+    }
+}
+
+bool BattleManager::checkLevelUp(int unitId) {
+    // TODO: レベルアップ判定
+    return false;
 }
