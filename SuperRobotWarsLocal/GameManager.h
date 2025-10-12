@@ -11,19 +11,21 @@
 #include "InputManager.h"
 #include "SDLRenderer.h"
 #include "Camera.h"
-#include "BattleCalculator.h"  // これをファイル先頭のインクルード部分に追加
-#include <sstream>  // これもファイル先頭に追加
+#include "BattleCalculator.h"
+#include "UnitDatabase.h"  // ← 追加
+#include <sstream>
+#include "AudioManager.h" 
 
 /// ゲーム全体の状態
 enum class GameState {
-    MainMenu,           // メインメニュー
-    StageSelect,        // ステージ選択
-    InBattle,           // 戦闘中
-    PlayerTurn,         // プレイヤーターン
-    EnemyTurn,          // 敵ターン
-    BattleResult,       // 戦闘結果
-    GameOver,           // ゲームオーバー
-    Exit                // 終了
+    MainMenu,
+    StageSelect,
+    InBattle,
+    PlayerTurn,
+    EnemyTurn,
+    BattleResult,
+    GameOver,
+    Exit
 };
 
 /// ゲーム全体を管理するクラス
@@ -38,11 +40,11 @@ public:
     );
     ~GameManager();
 
-    /// ゲームメインループ
     void run();
-
-    /// 現在の状態取得
     GameState getState() const { return state_; }
+
+    // AudioManager設定（追加）
+    void setAudioManager(AudioManager* audioMgr) { audioManager_ = audioMgr; }
 
 private:
     // コンポーネント
@@ -55,6 +57,8 @@ private:
     std::unique_ptr<BattleManager> battleManager_;
     std::unique_ptr<Camera> camera_;
 
+    UnitDatabase unitDB_;  // ← 追加
+
     // ゲーム状態
     GameState state_;
     int windowW_;
@@ -62,13 +66,13 @@ private:
     int currentTurn_;
 
     // ユニット選択状態
-    int selectedUnitId_;              // 選択中のユニットID（-1=未選択）
-    bool isSelectingDestination_;     // 移動先選択中か
-    bool isShowingMenu_;              // メニュー表示中か
-    bool isSelectingAttackTarget_;    // 攻撃対象選択中か
-    int menuCursor_;                  // メニューカーソル位置
-    std::vector<std::pair<int, int>> movableArea_;   // 移動可能範囲
-    std::vector<std::pair<int, int>> attackableArea_; // 攻撃可能範囲
+    std::string selectedUnitId_;  // ← int から std::string に変更
+    bool isSelectingDestination_;
+    bool isShowingMenu_;
+    bool isSelectingAttackTarget_;
+    int menuCursor_;
+    std::vector<std::pair<int, int>> movableArea_;
+    std::vector<std::pair<int, int>> attackableArea_;
 
     // 状態別の処理
     void updateMainMenu();
@@ -81,22 +85,22 @@ private:
     void render();
     void renderMainMenu();
     void renderBattle();
-    void renderUI();           // UI要素の描画
-    void renderUnitInfo();     // ユニット情報表示
+    void renderUI();
+    void renderUnitInfo();
 
     // バトル開始
     void startBattle(const std::string& mapPath);
 
     // ユニット操作
-    void selectUnit();           // カーソル位置のユニットを選択
-    void cancelSelection();      // 選択をキャンセル
-    void confirmMove();          // 移動を確定
-    void showUnitMenu();         // ユニットメニュー表示
-    void handleMenuInput();      // メニュー入力処理
-    void selectAttack();         // 攻撃選択
-    void selectWait();           // 待機選択
-    void handleAttackTargetSelection(); // 攻撃対象選択処理
-    void executeAttack(int targetId);   // 攻撃実行
+    void selectUnit();
+    void cancelSelection();
+    void confirmMove();
+    void showUnitMenu();
+    void handleMenuInput();
+    void selectAttack();
+    void selectWait();
+    void handleAttackTargetSelection();
+    void executeAttack(int targetId);  // この引数は実際には使わない
 
     // ターン処理
     void startPlayerTurnPhase();
@@ -108,4 +112,6 @@ private:
     bool checkDefeatCondition();
     void playBattleAnimation(int attackerId, int defenderId);
     void showBattleResultDialog(const BattleResult& result);
+
+    AudioManager* audioManager_;
 };

@@ -16,25 +16,37 @@ PlayerMoveCommand::PlayerMoveCommand(const nlohmann::json& evt)
 void PlayerMoveCommand::execute(ExecutionEngine& engine) {
     auto* cursor = engine.getCursor();
     auto* bm = engine.getBattleManager();
-    auto* map = engine.getTileMap();  // 修正：getTileMap()を使用
+    auto* map = engine.getTileMap();
 
     if (!cursor || !bm || !map) {
         std::cerr << "[PlayerMoveCommand] missing dependencies\n";
         return;
     }
 
-    // ユニット初期位置にスナップ
-    auto pos = bm->getUnitPosition(unitId_);
-    if (snapCursorToUnit_) {
-        cursor->setPosition(pos[0], pos[1]);
+    // ユニットID生成
+    std::string unitIdStr = "unit_" + std::to_string(unitId_);
+
+    // ユニット取得
+    Unit* unit = bm->getUnitById(unitIdStr);
+    if (!unit) {
+        std::cerr << "[PlayerMoveCommand] Unit not found: " << unitIdStr << "\n";
+        return;
     }
 
-    // 移動可能範囲を計算（仮の移動力 5 で計算）
-    const int maxMove = 5;
-    auto reachable = computeReachable(map, pos[0], pos[1], maxMove);
+    // ユニット初期位置にスナップ
+    int posX = unit->getX();
+    int posY = unit->getY();
+
+    if (snapCursorToUnit_) {
+        cursor->setPosition(posX, posY);
+    }
+
+    // 移動可能範囲を計算
+    const int maxMove = unit->getMoveRange();
+    auto reachable = computeReachable(map, posX, posY, maxMove);
     engine.setHighlightTiles(reachable);
 
-    // 最初の描画（範囲＋ユニット＋カーソル）
+    // 最初の描画
     engine.redraw();
 
     // 範囲内判定ヘルパー
@@ -99,6 +111,6 @@ void PlayerMoveCommand::execute(ExecutionEngine& engine) {
     // 決定マスへユニット移動
     const int cx = cursor->getX();
     const int cy = cursor->getY();
-    bm->moveUnit(unitId_, cx, cy);
+    bm->moveUnit(unitIdStr, cx, cy);
     engine.redraw();
 }

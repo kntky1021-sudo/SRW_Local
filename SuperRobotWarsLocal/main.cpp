@@ -1,21 +1,23 @@
-#include <SDL.h>
+#include <SDL.h>           // SDL3（メイン）
+#include <SDL_mixer.h>    // SDL2_mixer（音響のみ）
 #include <iostream>
-#include <fstream>
-#include <cstdint>
-#include <vector>
-#include <filesystem>
 #include "SDLRenderer.h"
 #include "UIManager.h"
 #include "InputManager.h"
 #include "GameManager.h"
-#include "UnitDatabase.h"
+#include "AudioManager.h"
 
 int main(int argc, char** argv) {
 
-    // SDL 本体初期化
-    if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
-        std::cerr << "SDL_Init failed: " << SDL_GetError() << "\n";
+    // SDL3 初期化（映像・入力）
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
+        std::cerr << "SDL3_Init failed: " << SDL_GetError() << "\n";
         return -1;
+    }
+
+    // SDL2 音声サブシステム初期化（SDL2_mixer用）
+    if (SDL_InitSubSystem(SDL_INIT_AUDIO) < 0) {
+        std::cerr << "SDL_InitSubSystem(AUDIO) failed: " << SDL_GetError() << "\n";
     }
 
     constexpr int WINDOW_W = 640;
@@ -45,34 +47,26 @@ int main(int argc, char** argv) {
     UIManager uiManager(&sdlRenderer);
     InputManager inputManager;
 
-    // ユニットデータベース初期化
-    UnitDatabase unitDB;
-    std::cout << "[Main] Loading unit database...\n";
-
-    if (!unitDB.loadRobots("data/robots.json")) {
-        std::cerr << "[Main] Warning: Failed to load robots.json\n";
+    // AudioManager初期化（SDL2_mixer使用）
+    AudioManager audioManager;
+    if (!audioManager.initialize()) {
+        std::cerr << "[Main] Warning: AudioManager initialization failed\n";
+        std::cerr << "[Main] Game will continue without sound\n";
     }
+    else {
+        // BGM読み込み
+        audioManager.loadBGM("title", "assets/audio/bgm/title.wav");
+        audioManager.loadBGM("battle", "assets/audio/bgm/battle.wav");
+        audioManager.loadBGM("map", "assets/audio/bgm/map.wav");
 
-    if (!unitDB.loadPilots("data/pilots.json")) {
-        std::cerr << "[Main] Warning: Failed to load pilots.json\n";
-    }
+        // 効果音プリロード
+        audioManager.preloadCommonSE();
 
-    auto robotIds = unitDB.getRobotIds();
-    std::cout << "[Main] Loaded " << robotIds.size() << " robots:\n";
-    for (const auto& id : robotIds) {
-        auto* robot = unitDB.getRobot(id);
-        if (robot) {
-            std::cout << "  - " << robot->name << " (" << id << ")\n";
-        }
-    }
+        // マスター音量設定
+        audioManager.setMasterVolume(80);
 
-    auto pilotIds = unitDB.getPilotIds();
-    std::cout << "[Main] Loaded " << pilotIds.size() << " pilots:\n";
-    for (const auto& id : pilotIds) {
-        auto* pilot = unitDB.getPilot(id);
-        if (pilot) {
-            std::cout << "  - " << pilot->name << " (" << id << ")\n";
-        }
+        // タイトルBGM再生
+        audioManager.playBGM("title", true, 1000);
     }
 
     GameManager gameManager(
@@ -83,8 +77,15 @@ int main(int argc, char** argv) {
         WINDOW_H
     );
 
+    // GameManagerにAudioManagerを渡す
+    gameManager.setAudioManager(&audioManager);
+
+    std::cout << "[Main] Starting game loop...\n";
     gameManager.run();
 
+    // 終了処理
+    std::cout << "[Main] Shutting down...\n";
+    audioManager.shutdown();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     SDL_Quit();

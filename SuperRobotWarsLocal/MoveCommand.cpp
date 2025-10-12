@@ -25,15 +25,26 @@ void MoveCommand::execute(ExecutionEngine& engine) {
         return;
     }
 
+    // ユニットID生成（簡易版：unitIdから文字列生成）
+    std::string unitIdStr = "unit_" + std::to_string(unitId_);
+
+    // ユニット取得
+    Unit* unit = bm->getUnitById(unitIdStr);
+    if (!unit) {
+        std::cerr << "[MoveCommand] Unit not found: " << unitIdStr << "\n";
+        return;
+    }
+
     // 開始位置にカーソルを置き、表示・キー待ち
-    auto start = bm->getUnitPosition(unitId_);
-    cursor->setPosition(start[0], start[1]);
+    int startX = unit->getX();
+    int startY = unit->getY();
+    cursor->setPosition(startX, startY);
     engine.redraw();
-    engine.waitKey();  // 修正：engine.waitKey()を使用
+    engine.waitKey();
 
     // 移動→再描画→キー待ち
-    bm->moveUnit(unitId_, toPos_[0], toPos_[1]);
+    bm->moveUnit(unitIdStr, toPos_[0], toPos_[1]);
     cursor->setPosition(toPos_[0], toPos_[1]);
     engine.redraw();
-    engine.waitKey();  // 修正：engine.waitKey()を使用
+    engine.waitKey();
 }

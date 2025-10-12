@@ -9,17 +9,19 @@
 #include <iostream>
 #include <sstream>
 #include "TextureManager.h"
+#include "AudioManager.h" 
 
 BattleScene::BattleScene(UIManager* ui, SDLRenderer* renderer)
     : ui_(ui)
     , renderer_(renderer)
+    , audioManager_(nullptr)  // ← 追加
 {
 }
 
 BattleResult BattleScene::performBattle(
     Unit* attacker,
     Unit* defender,
-    Weapon* weapon,
+    const WeaponData* weapon,
     char terrain)
 {
     if (!attacker || !defender) {
@@ -32,12 +34,11 @@ BattleResult BattleScene::performBattle(
     // TextureManager作成と画像読み込み
     TextureManager texMgr(renderer_);
 
-    // テスト用画像を読み込み（実際の画像パスに後で変更）
+    // テスト用画像を読み込み
     std::string attackerTexId = "unit_" + attacker->getId();
     std::string defenderTexId = "unit_" + defender->getId();
 
     // 味方・敵それぞれのテスト画像を読み込み
-    // TODO: 実際のユニットIDに基づいた画像パスに変更
     texMgr.loadTexture(attackerTexId, "assets/units/test_ally.bmp");
     texMgr.loadTexture(defenderTexId, "assets/units/test_enemy.bmp");
 
@@ -74,7 +75,7 @@ BattleResult BattleScene::performBattle(
 
     // 4) 攻撃アニメーション
     battleUI.playAttackAnimation(true);
-    battleUI.renderBattleDemo();  // デモ画面を再描画
+    battleUI.renderBattleDemo();
     SDL_Delay(800);
 
     // 5) ダメージ表示
@@ -100,7 +101,6 @@ BattleResult BattleScene::performBattle(
     // 6) 反撃処理（将来実装）
     if (result.isCountered) {
         std::cout << "[BattleScene] Counter attack!\n";
-        // TODO: 反撃アニメーション
     }
 
     // 7) 戦闘結果表示
@@ -118,15 +118,13 @@ BattleResult BattleScene::performBattle(
         SDL_Delay(16);
     }
 
-    // TextureManagerは自動的にデストラクタで解放される
-
     return result;
 }
 
 void BattleScene::showBattlePreview(
     const Unit* attacker,
     const Unit* defender,
-    const Weapon* weapon,
+    const WeaponData* weapon,
     int hitRate)
 {
     std::stringstream ss;
@@ -135,8 +133,7 @@ void BattleScene::showBattlePreview(
     ss << "命中率: " << hitRate << "%\n";
 
     if (weapon) {
-        // 将来: 武器名を表示
-        ss << "武器: (仮)\n";
+        ss << "武器: " << weapon->name << "\n";
     }
 
     ss << "\nHP: " << attacker->getHp() << " vs " << defender->getHp();
@@ -146,17 +143,12 @@ void BattleScene::showBattlePreview(
 
 void BattleScene::playAttackAnimation(
     const Unit* attacker,
-    const Weapon* weapon)
+    const WeaponData* weapon)
 {
     std::stringstream ss;
     ss << attacker->getId() << " の攻撃！";
 
     ui_->showMessage(ss.str());
-
-    // TODO: 実際のアニメーション処理
-    // - スプライトの表示
-    // - エフェクトの再生
-    // - 効果音の再生
 }
 
 void BattleScene::showDamage(
@@ -194,7 +186,6 @@ void BattleScene::showBattleResult(
 
     ss << "経験値: +" << result.expGained << "\n";
 
-    // 反撃結果（将来実装）
     if (result.isCountered) {
         ss << "\n反撃ダメージ: " << result.counterDamage << "\n";
         if (result.attackerDestroyed) {

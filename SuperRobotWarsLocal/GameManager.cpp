@@ -19,12 +19,22 @@ GameManager::GameManager(
     , windowW_(windowW)
     , windowH_(windowH)
     , currentTurn_(1)
-    , selectedUnitId_(-1)
+    , selectedUnitId_("")
     , isSelectingDestination_(false)
     , isShowingMenu_(false)
     , isSelectingAttackTarget_(false)
     , menuCursor_(0)
+    , audioManager_(nullptr)  // ← これを追加
 {
+    // UnitDatabase初期化
+    std::cout << "[GameManager] Loading unit database...\n";
+    if (!unitDB_.loadRobots("data/robots.json")) {
+        std::cerr << "[GameManager] Failed to load robots.json\n";
+    }
+    if (!unitDB_.loadPilots("data/pilots.json")) {
+        std::cerr << "[GameManager] Failed to load pilots.json\n";
+    }
+
     // タイルマップ作成
     tileMap_ = std::make_unique<TileMap>(renderer_, 32, 32);
 
@@ -33,8 +43,6 @@ GameManager::GameManager(
 
     // バトルマネージャー作成
     battleManager_ = std::make_unique<BattleManager>(renderer_);
-
-    // カメラは後で初期化（マップサイズが必要）
 }
 
 GameManager::~GameManager() = default;
@@ -100,6 +108,10 @@ void GameManager::run() {
 void GameManager::startBattle(const std::string& mapPath) {
     std::cout << "[GameManager] Starting battle: " << mapPath << "\n";
 
+    if (audioManager_) {
+        audioManager_->playBGM("map", true, 1000);  // マップBGM（1秒フェードイン）
+    }
+
     // マップ読み込み
     if (!tileMap_->loadFromFile(mapPath)) {
         std::cerr << "[GameManager] Failed to load map\n";
@@ -118,20 +130,37 @@ void GameManager::startBattle(const std::string& mapPath) {
     // バトルマネージャー初期化
     battleManager_->startBattle(mapPath);
 
-    // ユニット配置
+    // ユニット配置（新方式）
     // 味方ユニット
-    battleManager_->addUnit(2, 2, false, "Gundam");
-    battleManager_->addUnit(3, 2, false, "Mazinger");
-    battleManager_->addUnit(4, 2, false, "Getter");
+    auto gundam = unitDB_.createUnit("player_gundam", "gundam_rx78", "amuro_ray", Team::Ally);
+    if (gundam) {
+        battleManager_->registerUnit(std::move(gundam), 2, 2);
+    }
 
-    // 敵ユニット（テスト用：1体のみ、HP10）
-    battleManager_->addUnit(5, 3, true, "Zaku A");
+    auto mazinger = unitDB_.createUnit("player_mazinger", "mazinger_z", "kouji_kabuto", Team::Ally);
+    if (mazinger) {
+        battleManager_->registerUnit(std::move(mazinger), 3, 2);
+    }
 
-    // カーソル初期位置（最初の味方ユニットに）
+    auto getter = unitDB_.createUnit("player_getter", "getter_robo", "ryoma_nagare", Team::Ally);
+    if (getter) {
+        battleManager_->registerUnit(std::move(getter), 4, 2);
+    }
+
+    // 敵ユニット
+    auto zaku1 = unitDB_.createUnit("enemy_zaku_1", "zaku_ii", "zaku_pilot", Team::Enemy);
+    if (zaku1) {
+        battleManager_->registerUnit(std::move(zaku1), 5, 3);
+    }
+
+    // デバッグ：全ユニット表示
+    battleManager_->printAllUnits();
+
+    // カーソル初期位置
     cursor_->setPosition(2, 2);
 
     // ユニット選択状態リセット
-    selectedUnitId_ = -1;
+    selectedUnitId_ = "";
     isSelectingDestination_ = false;
     isShowingMenu_ = false;
     isSelectingAttackTarget_ = false;
@@ -257,6 +286,10 @@ void GameManager::updatePlayerTurn() {
 
 void GameManager::updateEnemyTurn() {
     std::cout << "[GameManager] === Enemy Turn " << currentTurn_ << " ===\n";
+
+    if (audioManager_) {
+        audioManager_->playSE("decide");
+    }
 
     // 簡易的な敵ターン処理
     // TODO: 実際の敵AI実装
@@ -396,6 +429,10 @@ bool GameManager::checkVictoryCondition() {
 
     if (aliveEnemies == 0) {
         std::cout << "[GameManager] === VICTORY ===\n";
+        if (audioManager_) {
+            audioManager_->stopBGM(1000);  // BGMフェードアウト
+            // audioManager_->playSE("victory");  // 勝利SE（追加する場合）
+        }
         std::cout << "[GameManager] All enemies defeated!\n";
         return true;
     }
@@ -410,6 +447,10 @@ bool GameManager::checkDefeatCondition() {
     if (aliveAllies == 0) {
         std::cout << "[GameManager] === DEFEAT ===\n";
         std::cout << "[GameManager] All allies destroyed!\n";
+        if (audioManager_) {
+            audioManager_->stopBGM(1000);
+            // audioManager_->playSE("gameover");  // 敗北SE（追加する場合）
+        }
         return true;
     }
 
@@ -439,9 +480,9 @@ void GameManager::renderUI() {
 void GameManager::renderUnitInfo() {
     int cx = cursor_->getX();
     int cy = cursor_->getY();
-    int unitId = battleManager_->getUnitAt(cx, cy);
+    Unit* unit = battleManager_->getUnitAt(cx, cy);
 
-    if (unitId < 0) return;  // ユニットがいない
+    if (!unit) return;
 
     auto* sdlR = renderer_->getSDLRenderer();
 
@@ -456,11 +497,11 @@ void GameManager::renderUnitInfo() {
     SDL_SetRenderDrawBlendMode(sdlR, SDL_BLENDMODE_BLEND);
 
     // 敵味方で色分け
-    if (battleManager_->isEnemyUnit(unitId)) {
-        SDL_SetRenderDrawColor(sdlR, 100, 0, 0, 200);  // 赤系
+    if (unit->getTeam() == Team::Enemy) {
+        SDL_SetRenderDrawColor(sdlR, 100, 0, 0, 200);
     }
     else {
-        SDL_SetRenderDrawColor(sdlR, 0, 0, 100, 200);  // 青系
+        SDL_SetRenderDrawColor(sdlR, 0, 0, 100, 200);
     }
     SDL_RenderFillRect(sdlR, &panelRect);
 
@@ -468,26 +509,7 @@ void GameManager::renderUnitInfo() {
     SDL_SetRenderDrawColor(sdlR, 255, 255, 255, 255);
     SDL_RenderRect(sdlR, &panelRect);
 
-    // HPバー（簡易版）
-    auto pos = battleManager_->getUnitPosition(unitId);
-
-    // ユニット名表示位置（テキストの代わりにマーカー）
-    SDL_FRect nameMarker{
-        panelRect.x + 10,
-        panelRect.y + 10,
-        10.0f,
-        10.0f
-    };
-
-    if (battleManager_->isEnemyUnit(unitId)) {
-        SDL_SetRenderDrawColor(sdlR, 255, 0, 0, 255);
-    }
-    else {
-        SDL_SetRenderDrawColor(sdlR, 0, 0, 255, 255);
-    }
-    SDL_RenderFillRect(sdlR, &nameMarker);
-
-    // TODO: 実際のユニット名とHPをフォントで描画
+    // TODO: ユニット名とHPをフォントで描画
     // 現状は色で敵味方を区別するのみ
 }
 
@@ -496,9 +518,15 @@ void GameManager::selectUnit() {
     int cy = cursor_->getY();
 
     // カーソル位置にユニットがいるかチェック
-    int unitId = battleManager_->getUnitAt(cx, cy);
+    Unit* unit = battleManager_->getUnitAt(cx, cy);
 
-    if (unitId >= 0) {
+    if (unit) {
+        std::string unitId = unit->getId();
+
+        if (audioManager_) {
+            audioManager_->playSE("decide");
+        }
+
         // 敵ユニットは選択できない
         if (battleManager_->isEnemyUnit(unitId)) {
             std::cout << "[GameManager] Cannot select enemy unit\n";
@@ -514,22 +542,22 @@ void GameManager::selectUnit() {
         selectedUnitId_ = unitId;
         isSelectingDestination_ = true;
 
-        std::cout << "[GameManager] Unit " << battleManager_->getUnitName(unitId)
-            << " (ID:" << unitId << ") selected at ("
-            << cx << ", " << cy << ")\n";
+        std::cout << "[GameManager] Unit " << unitId
+            << " selected at (" << cx << ", " << cy << ")\n";
 
-        // 移動可能範囲を計算（仮：周囲5マス）
+        // 移動可能範囲を計算
+        int moveRange = unit->getMoveRange();
         movableArea_.clear();
-        for (int dy = -5; dy <= 5; ++dy) {
-            for (int dx = -5; dx <= 5; ++dx) {
-                if (std::abs(dx) + std::abs(dy) <= 5) {
+        for (int dy = -moveRange; dy <= moveRange; ++dy) {
+            for (int dx = -moveRange; dx <= moveRange; ++dx) {
+                if (std::abs(dx) + std::abs(dy) <= moveRange) {
                     int nx = cx + dx;
                     int ny = cy + dy;
                     if (nx >= 0 && ny >= 0 &&
                         nx < tileMap_->getMapWidth() &&
                         ny < tileMap_->getMapHeight()) {
                         // 他のユニットがいない場所のみ
-                        if (battleManager_->getUnitAt(nx, ny) < 0) {
+                        if (!battleManager_->getUnitAt(nx, ny)) {
                             movableArea_.push_back({ nx, ny });
                         }
                     }
@@ -541,21 +569,28 @@ void GameManager::selectUnit() {
             << " tiles\n";
     }
     else {
+        // エラー音
+        if (audioManager_) {
+            audioManager_->playSE("cancel");
+        }
         std::cout << "[GameManager] No unit at cursor position\n";
     }
 }
 
 void GameManager::cancelSelection() {
     if (isSelectingDestination_) {
+        if (audioManager_) {
+            audioManager_->playSE("cancel");
+        }
         std::cout << "[GameManager] Move cancelled\n";
-        selectedUnitId_ = -1;
+        selectedUnitId_ = "";
         isSelectingDestination_ = false;
         movableArea_.clear();
     }
 }
 
 void GameManager::confirmMove() {
-    if (selectedUnitId_ < 0) return;
+    if (selectedUnitId_.empty()) return;
 
     int destX = cursor_->getX();
     int destY = cursor_->getY();
@@ -571,9 +606,13 @@ void GameManager::confirmMove() {
 
     if (canMove) {
         // ユニット移動
+                // 移動音
+        if (audioManager_) {
+            audioManager_->playSE("decide");
+        }
         battleManager_->moveUnit(selectedUnitId_, destX, destY);
-        std::cout << "[GameManager] Unit " << battleManager_->getUnitName(selectedUnitId_)
-            << " (ID:" << selectedUnitId_ << ") moved to (" << destX << ", " << destY << ")\n";
+        std::cout << "[GameManager] Unit " << selectedUnitId_
+            << " moved to (" << destX << ", " << destY << ")\n";
 
         // 移動可能範囲クリア
         movableArea_.clear();
@@ -582,13 +621,15 @@ void GameManager::confirmMove() {
         // 行動済みフラグを立てる
         battleManager_->setUnitActed(selectedUnitId_, true);
 
-        // 少し待機してからメニュー表示（キー入力のクリア）
+        // 少し待機してからメニュー表示
         SDL_Delay(100);
 
-        // selectedUnitId_は保持したままメニュー表示
         showUnitMenu();
     }
     else {
+        if (audioManager_) {
+            audioManager_->playSE("cancel");
+        }
         std::cout << "[GameManager] Cannot move to (" << destX << ", "
             << destY << ")\n";
     }
@@ -652,50 +693,30 @@ void GameManager::handleMenuInput() {
 void GameManager::selectAttack() {
     isShowingMenu_ = false;
 
+    Unit* attacker = battleManager_->getUnitById(selectedUnitId_);
+    if (!attacker) {
+        std::cerr << "[GameManager] Attacker not found\n";
+        return;
+    }
+
     // 武器選択UI作成
     WeaponSelectUI weaponUI(renderer_, ui_);
 
-    // テスト用武器リスト作成
-    std::vector<WeaponData> weapons;
+    // ユニットの実際の武器を取得
+    const auto& weapons = attacker->getWeapons();
 
-    // テスト武器1
-    WeaponData weapon1;
-    weapon1.name = "Beam Rifle";
-    weapon1.power = 2000;
-    weapon1.minRange = 2;
-    weapon1.maxRange = 5;
-    weapon1.ammo = 8;
-    weapon1.enCost = 10;
-    weapon1.isMap = false;
-    weapon1.attribute = "Beam";
-    weapons.push_back(weapon1);
+    if (weapons.empty()) {
+        std::cout << "[GameManager] No weapons available\n";
+        selectWait();
+        return;
+    }
 
-    // テスト武器2
-    WeaponData weapon2;
-    weapon2.name = "Beam Saber";
-    weapon2.power = 2800;
-    weapon2.minRange = 1;
-    weapon2.maxRange = 1;
-    weapon2.ammo = -1;  // 無限
-    weapon2.enCost = 15;
-    weapon2.isMap = false;
-    weapon2.attribute = "Melee";
-    weapons.push_back(weapon2);
-
-    // テスト武器3
-    WeaponData weapon3;
-    weapon3.name = "Vulcan";
-    weapon3.power = 800;
-    weapon3.minRange = 1;
-    weapon3.maxRange = 3;
-    weapon3.ammo = 30;
-    weapon3.enCost = 0;
-    weapon3.isMap = false;
-    weapon3.attribute = "Physical";
-    weapons.push_back(weapon3);
-
-    // 武器選択（EN=100、距離=1と仮定）
-    int weaponIndex = weaponUI.selectWeapon(weapons, 100, 1);
+    // 武器選択（EN=現在のEN、距離=1と仮定）
+    int weaponIndex = weaponUI.selectWeapon(
+        weapons,
+        attacker->getCurrentEN(),
+        1  // TODO: 実際の距離計算
+    );
 
     if (weaponIndex < 0) {
         // キャンセル→メニューに戻る
@@ -705,35 +726,44 @@ void GameManager::selectAttack() {
 
     std::cout << "[GameManager] Selected weapon: " << weapons[weaponIndex].name << "\n";
 
-    // 攻撃対象選択へ
+    // 攻撃可能範囲を計算
     isSelectingAttackTarget_ = true;
 
-    // 攻撃可能範囲を計算（周囲1マス）
-    auto pos = battleManager_->getUnitPosition(selectedUnitId_);
-    int ux = pos[0];
-    int uy = pos[1];
+    int ux = attacker->getX();
+    int uy = attacker->getY();
 
     attackableArea_.clear();
 
-    // 上下左右をチェック
-    const int dx[] = { 0, 0, -1, 1 };
-    const int dy[] = { -1, 1, 0, 0 };
+    // 武器の射程を使用
+    const WeaponData* weapon = attacker->getWeapon(weaponIndex);
+    if (!weapon) {
+        selectWait();
+        return;
+    }
 
-    for (int i = 0; i < 4; ++i) {
-        int nx = ux + dx[i];
-        int ny = uy + dy[i];
+    int minRange = weapon->minRange;
+    int maxRange = weapon->maxRange;
 
-        if (nx >= 0 && ny >= 0 &&
-            nx < tileMap_->getMapWidth() &&
-            ny < tileMap_->getMapHeight()) {
-            // 敵ユニットがいる場所のみ
-            int targetId = battleManager_->getUnitAt(nx, ny);
+    // 射程内の敵を検索
+    for (int dy = -maxRange; dy <= maxRange; ++dy) {
+        for (int dx = -maxRange; dx <= maxRange; ++dx) {
+            int dist = std::abs(dx) + std::abs(dy);
+            if (dist >= minRange && dist <= maxRange) {
+                int nx = ux + dx;
+                int ny = uy + dy;
 
-            if (targetId >= 0 && battleManager_->isEnemyUnit(targetId)) {
-                attackableArea_.push_back({ nx, ny });
-                std::cout << "[GameManager] Target: "
-                    << battleManager_->getUnitName(targetId)
-                    << " at (" << nx << ", " << ny << ")\n";
+                if (nx >= 0 && ny >= 0 &&
+                    nx < tileMap_->getMapWidth() &&
+                    ny < tileMap_->getMapHeight()) {
+
+                    Unit* target = battleManager_->getUnitAt(nx, ny);
+                    if (target && battleManager_->isEnemyUnit(target->getId())) {
+                        attackableArea_.push_back({ nx, ny });
+                        std::cout << "[GameManager] Target: "
+                            << target->getId()
+                            << " at (" << nx << ", " << ny << ")\n";
+                    }
+                }
             }
         }
     }
@@ -751,12 +781,10 @@ void GameManager::selectAttack() {
 
 void GameManager::selectWait() {
     isShowingMenu_ = false;
-    std::cout << "[GameManager] Unit " << battleManager_->getUnitName(selectedUnitId_)
-        << " is waiting\n";
-    // 行動済みフラグは移動時に既にセット済み
-
-    // 選択をリセット
-    selectedUnitId_ = -1;
+    if (!selectedUnitId_.empty()) {
+        std::cout << "[GameManager] Unit " << selectedUnitId_ << " is waiting\n";
+        selectedUnitId_ = "";
+    }
 }
 
 void GameManager::handleAttackTargetSelection() {
@@ -793,7 +821,7 @@ void GameManager::handleAttackTargetSelection() {
         if (keyState[SDL_SCANCODE_Z]) {
             int cx = cursor_->getX();
             int cy = cursor_->getY();
-            int targetId = battleManager_->getUnitAt(cx, cy);
+            Unit* target = battleManager_->getUnitAt(cx, cy);  // Unit* に変更
 
             // 攻撃可能範囲内かチェック
             bool canAttack = false;
@@ -804,13 +832,10 @@ void GameManager::handleAttackTargetSelection() {
                 }
             }
 
-            if (canAttack && targetId >= 0) {
-                executeAttack(targetId);
+            if (canAttack && target) {
+                executeAttack(0);  // 引数は使われない
                 keyPressed = true;
-                return;  // 攻撃実行したら即リターン
-            }
-            else {
-                // デバッグ情報は削除（攻撃は実行されるが、エラーが出るのは誤検知）
+                return;
             }
             keyPressed = true;
         }
@@ -835,75 +860,59 @@ void GameManager::handleAttackTargetSelection() {
 }
 
 void GameManager::executeAttack(int targetId) {
+    // この引数は使わない（旧方式の名残）
+    (void)targetId;
+
     isSelectingAttackTarget_ = false;
     attackableArea_.clear();
 
-    auto attackerPos = battleManager_->getUnitPosition(selectedUnitId_);
-    auto defenderPos = battleManager_->getUnitPosition(targetId);
+    int cx = cursor_->getX();
+    int cy = cursor_->getY();
 
-    std::cout << "[GameManager] " << battleManager_->getUnitName(selectedUnitId_)
-        << " attacks " << battleManager_->getUnitName(targetId) << "!\n";
-
-    // 簡易ユニットオブジェクトの作成（仮実装）
-    // TODO: 将来的にはBattleManagerから完全なUnitオブジェクトを取得
-    Unit attackerUnit(
-        battleManager_->getUnitName(selectedUnitId_),
-        Team::Ally,
-        'P',
-        battleManager_->getUnitMaxHP(selectedUnitId_),
-        5,  // moveRange
-        1,  // attackRange
-        100,  // attackPower
-        50,  // defensePower
-        100   // speed
-    );
-    attackerUnit.setPosition(attackerPos[0], attackerPos[1]);
-    // 現在のHPを設定（簡易版）
-    int currentHp = battleManager_->getUnitHP(selectedUnitId_);
-    int maxHp = battleManager_->getUnitMaxHP(selectedUnitId_);
-    if (currentHp < maxHp) {
-        attackerUnit.takeDamage(maxHp - currentHp);
+    Unit* defender = battleManager_->getUnitAt(cx, cy);
+    if (!defender) {
+        std::cerr << "[GameManager] No unit at target position\n";
+        selectedUnitId_ = "";
+        return;
     }
 
-    Unit defenderUnit(
-        battleManager_->getUnitName(targetId),
-        Team::Enemy,
-        'E',
-        battleManager_->getUnitMaxHP(targetId),
-        5,
-        1,
-        50,
-        30,
-        80
-    );
-    defenderUnit.setPosition(defenderPos[0], defenderPos[1]);
-    currentHp = battleManager_->getUnitHP(targetId);
-    maxHp = battleManager_->getUnitMaxHP(targetId);
-    if (currentHp < maxHp) {
-        defenderUnit.takeDamage(maxHp - currentHp);
+    Unit* attacker = battleManager_->getUnitById(selectedUnitId_);
+    if (!attacker) {
+        std::cerr << "[GameManager] Attacker not found\n";
+        selectedUnitId_ = "";
+        return;
+    }
+
+    std::cout << "[GameManager] " << attacker->getId()
+        << " attacks " << defender->getId() << "!\n";
+
+    if (audioManager_) {
+        audioManager_->playBGM("battle", false);  // 戦闘BGM（ループなし）
     }
 
     // BattleSceneで戦闘実行
     BattleScene battleScene(ui_, renderer_);
     BattleResult result = battleScene.performBattle(
-        &attackerUnit,
-        &defenderUnit,
-        nullptr,  // 武器は後で実装
-        'L'       // 地形
+        attacker,
+        defender,
+        attacker->getWeapon(0),  // TODO: 選択した武器を使用
+        'L'  // 地形
     );
 
-    // 結果をBattleManagerに反映
-    battleManager_->applyDamage(targetId, result.damage);
-
+    // 結果をBattleManagerに反映（既にBattleSceneで反映済み）
     // 経験値付与
     battleManager_->addExperience(selectedUnitId_, result.expGained);
 
     // 選択をリセット
-    selectedUnitId_ = -1;
+    selectedUnitId_ = "";
 
     // 元の画面に戻る
     render();
     SDL_Delay(500);
+
+    if (audioManager_) {
+        audioManager_->playBGM("map", true, 500);  // 0.5秒フェードイン
+    }
 
     // 攻撃後に勝利条件チェック
     if (checkVictoryCondition()) {

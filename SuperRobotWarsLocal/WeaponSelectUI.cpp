@@ -2,6 +2,7 @@
 #include "SDLRenderer.h"
 #include "UIManager.h"
 #include <SDL.h>
+#include <SDL3_ttf/SDL_ttf.h>
 #include <iostream>
 #include <sstream>
 
@@ -107,6 +108,14 @@ void WeaponSelectUI::drawWeaponList(
     // タイトル
     drawText("=== Select Weapon ===", boxX + 10, boxY + 10);
 
+    // フォント読み込み
+    TTF_Font* font = TTF_OpenFont("assets/mplus-1m-regular.ttf", 20);
+    if (!font) {
+        std::cerr << "[WeaponSelectUI] Failed to load font\n";
+        renderer_->present();
+        return;
+    }
+
     // 武器リスト
     int yOffset = boxY + 50;
     const int lineHeight = 60;
@@ -120,7 +129,7 @@ void WeaponSelectUI::drawWeaponList(
         if (isSelected) {
             SDL_FRect cursorRect{
                 static_cast<float>(boxX + 15),
-                static_cast<float>(yOffset),
+                static_cast<float>(yOffset + 5),
                 10, 10
             };
             SDL_SetRenderDrawColor(sdlRen, 255, 255, 0, 255);
@@ -133,13 +142,19 @@ void WeaponSelectUI::drawWeaponList(
         if (!usable) {
             ss << " (----)";
         }
-        drawText(ss.str(), boxX + 40, yOffset);
+
+        SDL_Color textColor = usable ?
+            SDL_Color{ 255, 255, 255, 255 } :
+            SDL_Color{ 128, 128, 128, 255 };
+
+        drawTextWithFont(font, ss.str(), boxX + 40, yOffset, textColor);
 
         // 武器情報
         ss.str("");
         ss << "Power:" << weapon.power
             << " Range:" << weapon.minRange << "-" << weapon.maxRange;
-        drawText(ss.str(), boxX + 40, yOffset + 20);
+        drawTextWithFont(font, ss.str(), boxX + 40, yOffset + 22,
+            SDL_Color{ 200, 200, 200, 255 });
 
         // EN/弾数
         ss.str("");
@@ -150,14 +165,17 @@ void WeaponSelectUI::drawWeaponList(
             if (weapon.enCost > 0) ss << " ";
             ss << "Ammo:" << weapon.ammo;
         }
-        drawText(ss.str(), boxX + 40, yOffset + 40);
+        drawTextWithFont(font, ss.str(), boxX + 40, yOffset + 42,
+            SDL_Color{ 180, 180, 180, 255 });
 
         yOffset += lineHeight;
     }
 
     // 操作説明
-    drawText("UP/DOWN: Select  Z: Decide  X: Cancel",
-        boxX + 10, boxY + boxH - 30);
+    drawTextWithFont(font, "UP/DOWN: Select  Z: Decide  X: Cancel",
+        boxX + 10, boxY + boxH - 30, SDL_Color{ 255, 255, 100, 255 });
+
+    TTF_CloseFont(font);
 
     renderer_->present();
 }
@@ -192,11 +210,44 @@ void WeaponSelectUI::drawBox(int x, int y, int w, int h)
 
 void WeaponSelectUI::drawText(const std::string& text, int x, int y)
 {
-    // TODO: 実際のフォント描画
-    // 現状は位置マーカーのみ
+    // 簡易版（マーカーのみ）
     auto* sdlRen = renderer_->getSDLRenderer();
     SDL_SetRenderDrawColor(sdlRen, 255, 255, 255, 255);
     SDL_RenderPoint(sdlRen, x, y);
+}
+
+void WeaponSelectUI::drawTextWithFont(
+    TTF_Font* font,
+    const std::string& text,
+    int x,
+    int y,
+    SDL_Color color)
+{
+    if (!font || text.empty()) return;
+
+    auto* sdlRen = renderer_->getSDLRenderer();
+
+    SDL_Surface* surf = TTF_RenderText_Blended(font, text.c_str(), 0, color);
+    if (!surf) return;
+
+    SDL_Texture* tex = SDL_CreateTextureFromSurface(sdlRen, surf);
+    if (!tex) {
+        SDL_DestroySurface(surf);
+        return;
+    }
+
+    SDL_FRect srcRect{ 0, 0,
+                       static_cast<float>(surf->w),
+                       static_cast<float>(surf->h) };
+    SDL_FRect dstRect{ static_cast<float>(x),
+                       static_cast<float>(y),
+                       static_cast<float>(surf->w),
+                       static_cast<float>(surf->h) };
+
+    SDL_RenderTexture(sdlRen, tex, &srcRect, &dstRect);
+
+    SDL_DestroyTexture(tex);
+    SDL_DestroySurface(surf);
 }
 
 bool WeaponSelectUI::isWeaponUsable(

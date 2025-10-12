@@ -1,5 +1,3 @@
-// src/EnemyAttackCommand.cpp
-
 #include "EnemyAttackCommand.h"
 #include "ExecutionEngine.h"
 #include "ReachableArea.h"
@@ -15,7 +13,7 @@ EnemyAttackCommand::EnemyAttackCommand(const nlohmann::json& evt)
 
 void EnemyAttackCommand::execute(ExecutionEngine& engine) {
     auto* bm = engine.getBattleManager();
-    auto* map = engine.getTileMap();  // 修正：getTileMap()を使用
+    auto* map = engine.getTileMap();
     auto* cursor = engine.getCursor();
 
     if (!bm || !map || !cursor) {
@@ -23,37 +21,46 @@ void EnemyAttackCommand::execute(ExecutionEngine& engine) {
         return;
     }
 
-    // 1) 自ユニット位置取得
-    auto pos = bm->getUnitPosition(unitId_);
+    // ユニットID生成
+    std::string unitIdStr = "unit_" + std::to_string(unitId_);
 
-    // 2) 攻撃可能範囲を計算
-    auto rangeTiles = computeReachable(map, pos[0], pos[1], attackRange_);
+    // 自ユニット取得
+    Unit* attacker = bm->getUnitById(unitIdStr);
+    if (!attacker) {
+        std::cerr << "[EnemyAttackCommand] Attacker not found: " << unitIdStr << "\n";
+        return;
+    }
 
-    // 3) 範囲内の味方ユニットをサーチ
-    int targetId = -1;
+    // 自ユニット位置取得
+    int posX = attacker->getX();
+    int posY = attacker->getY();
+
+    // 攻撃可能範囲を計算
+    auto rangeTiles = computeReachable(map, posX, posY, attackRange_);
+
+    // 範囲内の味方ユニットをサーチ
+    std::string targetId;
     for (auto const& p : rangeTiles) {
-        int id = bm->getUnitAt(p.first, p.second);
-        if (id >= 0 && id != unitId_) {
-            targetId = id;
+        Unit* target = bm->getUnitAt(p.first, p.second);
+        if (target && target->getId() != unitIdStr && target->getTeam() == Team::Ally) {
+            targetId = target->getId();
             break;
         }
     }
 
-    if (targetId < 0) {
+    if (targetId.empty()) {
         std::cerr << "[EnemyAttackCommand] no target in range\n";
         return;
     }
 
-    // 4) ダメージ計算＆適用
-    int dmg = bm->calculateDamage(unitId_, targetId);
-    bm->applyDamage(targetId, dmg);
+    // 攻撃実行
+    bm->attack(unitIdStr, targetId);
 
-    // 5) ダメージ表示
+    // ダメージ表示
     {
         nlohmann::json msgEvt;
         msgEvt["type"] = "showMessage";
-        msgEvt["text"] = "敵" + std::to_string(unitId_) +
-            "の攻撃！ ダメージ: " + std::to_string(dmg);
+        msgEvt["text"] = "Enemy " + unitIdStr + " attacked!";
         ShowMessageCommand msgCmd(msgEvt);
         msgCmd.execute(engine);
     }

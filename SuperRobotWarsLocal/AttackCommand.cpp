@@ -24,8 +24,15 @@ void AttackCommand::execute(ExecutionEngine& engine) {
     int cx = cursor->getX();
     int cy = cursor->getY();
 
-    // 3) compute reachable with four args (修正: 4引数に変更)
-    const int attackRange = 1;  // 仮の攻撃射程
+    // カーソル位置のユニットを取得
+    Unit* attacker = bm->getUnitAt(cx, cy);
+    if (!attacker) {
+        std::cerr << "[AttackCommand] No attacker at cursor position\n";
+        return;
+    }
+
+    // 3) compute reachable with four args
+    const int attackRange = attacker->getAttackRange();
     auto reachable = computeReachable(map, cx, cy, attackRange);
 
     // 4) check target is in reachable
@@ -41,8 +48,15 @@ void AttackCommand::execute(ExecutionEngine& engine) {
         std::cerr << "[AttackCommand] target out of range\n";
     }
     else {
+        // ターゲット取得
+        Unit* defender = bm->getUnitAt(targetX_, targetY_);
+        if (!defender) {
+            std::cerr << "[AttackCommand] No defender at target position\n";
+            return;
+        }
+
         // perform attack
-        bm->attack(cx, cy, targetX_, targetY_);
+        bm->attack(attacker->getId(), defender->getId());
     }
 
     // 5) redraw & wait

@@ -1,4 +1,5 @@
 ﻿#include "BattleManager.h"
+#include "BattleCalculator.h"
 #include <SDL.h>
 #include <iostream>
 
@@ -11,33 +12,123 @@ BattleManager::~BattleManager() = default;
 
 void BattleManager::startBattle(const std::string& /*mapName*/) {
     units_.clear();
+    unitMap_.clear();
+    actedFlags_.clear();
     std::cout << "[BattleManager] Battle initialized\n";
 }
 
-void BattleManager::moveUnit(int unitId, int x, int y) {
-    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
-        units_[unitId].x = x;
-        units_[unitId].y = y;
+void BattleManager::registerUnit(std::unique_ptr<Unit> unit, int x, int y) {
+    if (!unit) {
+        std::cerr << "[BattleManager] Null unit provided\n";
+        return;
+    }
+
+    // 座標設定
+    unit->setPosition(x, y);
+
+    // ID取得
+    std::string unitId = unit->getId();
+
+    // 登録
+    Unit* unitPtr = unit.get();
+    units_.push_back(std::move(unit));
+    unitMap_[unitId] = unitPtr;
+    actedFlags_[unitId] = false;
+
+    std::cout << "[BattleManager] Unit registered: " << unitPtr->getId()
+        << " at (" << x << ", " << y << ") "
+        << (unitPtr->getTeam() == Team::Ally ? "Ally" : "Enemy")
+        << " HP:" << unitPtr->getHp() << "/" << unitPtr->getMaxHp() << "\n";
+}
+
+Unit* BattleManager::getUnitById(const std::string& unitId) {
+    auto it = unitMap_.find(unitId);
+    if (it != unitMap_.end()) {
+        return it->second;
+    }
+    return nullptr;
+}
+
+Unit* BattleManager::getUnitAt(int x, int y) {
+    for (auto& unit : units_) {
+        if (unit->getX() == x && unit->getY() == y && unit->isAlive()) {
+            return unit.get();
+        }
+    }
+    return nullptr;
+}
+
+const Unit* BattleManager::getUnitAt(int x, int y) const {
+    for (const auto& unit : units_) {
+        if (unit->getX() == x && unit->getY() == y && unit->isAlive()) {
+            return unit.get();
+        }
+    }
+    return nullptr;
+}
+
+void BattleManager::moveUnit(const std::string& unitId, int x, int y) {
+    Unit* unit = getUnitById(unitId);
+    if (unit) {
+        unit->setPosition(x, y);
+        std::cout << "[BattleManager] Unit " << unitId
+            << " moved to (" << x << ", " << y << ")\n";
+    }
+    else {
+        std::cerr << "[BattleManager] Unit not found: " << unitId << "\n";
     }
 }
 
-std::array<int, 2> BattleManager::getUnitPosition(int unitId) const {
-    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
-        return { units_[unitId].x, units_[unitId].y };
+void BattleManager::attack(const std::string& attackerId, const std::string& defenderId) {
+    Unit* attacker = getUnitById(attackerId);
+    Unit* defender = getUnitById(defenderId);
+
+    if (!attacker || !defender) {
+        std::cerr << "[BattleManager] Invalid attack: attacker or defender not found\n";
+        return;
     }
-    return { 0, 0 };
+
+    std::cout << "[BattleManager] Battle: " << attacker->getId()
+        << " vs " << defender->getId() << "\n";
+
+    // TODO: 武器選択ロジック（現在は最初の武器を使用）
+    const WeaponData* weapon = attacker->getWeapon(0);
+
+    // 戦闘計算実行
+    BattleResult result = BattleCalculator::execute(
+        attacker,
+        defender,
+        nullptr,  // 武器は後で実装
+        'L'       // 地形
+    );
+
+    // ダメージ適用
+    if (result.damage > 0) {
+        defender->takeDamage(result.damage);
+        std::cout << "[BattleManager] " << defender->getId()
+            << " took " << result.damage << " damage. HP: "
+            << defender->getHp() << "\n";
+    }
+
+    // 経験値付与
+    addExperience(attackerId, result.expGained);
+
+    // 撃破判定
+    if (result.defenderDestroyed) {
+        std::cout << "[BattleManager] " << defender->getId()
+            << " has been destroyed!\n";
+    }
 }
 
-void BattleManager::renderUnits(SDLRenderer* renderer,
-    int offsetX,
-    int offsetY) const {
+void BattleManager::renderUnits(SDLRenderer* renderer, int offsetX, int offsetY) const {
     auto* sdlR = renderer->getSDLRenderer();
-    for (const auto& u : units_) {
-        if (u.hp <= 0) continue;  // 撃破済みはスキップ
+
+    for (const auto& unit : units_) {
+        if (!unit->isAlive()) continue;
 
         SDL_FRect frect{
-            float(u.x * 32 - offsetX),
-            float(u.y * 32 - offsetY),
+            static_cast<float>(unit->getX() * 32 - offsetX),
+            static_cast<float>(unit->getY() * 32 - offsetY),
             32.0f,
             32.0f
         };
@@ -45,19 +136,17 @@ void BattleManager::renderUnits(SDLRenderer* renderer,
         SDL_SetRenderDrawBlendMode(sdlR, SDL_BLENDMODE_BLEND);
 
         // 敵味方で色分け
-        if (u.isEnemy) {
-            // 敵：赤色
+        if (unit->getTeam() == Team::Enemy) {
             SDL_SetRenderDrawColor(sdlR, 255, 0, 0, 128);
         }
         else {
-            // 味方：青色
             SDL_SetRenderDrawColor(sdlR, 0, 0, 255, 128);
         }
 
         SDL_RenderFillRect(sdlR, &frect);
 
         // 枠線
-        if (u.isEnemy) {
+        if (unit->getTeam() == Team::Enemy) {
             SDL_SetRenderDrawColor(sdlR, 255, 0, 0, 255);
         }
         else {
@@ -66,145 +155,55 @@ void BattleManager::renderUnits(SDLRenderer* renderer,
         SDL_RenderRect(sdlR, &frect);
 
         // 行動済みの場合は暗く表示
-        if (u.hasActed) {
+        if (hasUnitActed(unit->getId())) {
             SDL_SetRenderDrawColor(sdlR, 0, 0, 0, 100);
             SDL_RenderFillRect(sdlR, &frect);
         }
     }
 }
 
-// 指定座標にいるユニットIDを返す。いなければ -1。
-int BattleManager::getUnitAt(int x, int y) const {
-    for (size_t i = 0; i < units_.size(); ++i) {
-        if (units_[i].x == x && units_[i].y == y && units_[i].hp > 0) {
-            return static_cast<int>(i);
-        }
-    }
-    return -1;
+void BattleManager::setUnitActed(const std::string& unitId, bool acted) {
+    actedFlags_[unitId] = acted;
 }
 
-// ダメージ計算の stub 実装
-int BattleManager::calculateDamage(int attackerId, int defenderId) const {
-    (void)attackerId;
-    (void)defenderId;
-    return 10;  // 仮ダメージ
-}
-
-// ダメージ適用の stub 実装
-void BattleManager::applyDamage(int unitId, int damage) {
-    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
-        units_[unitId].hp -= damage;
-        if (units_[unitId].hp < 0) {
-            units_[unitId].hp = 0;
-        }
-        std::cout << "[BattleManager] Unit " << units_[unitId].name
-            << " took " << damage << " damage. HP: "
-            << units_[unitId].hp << "\n";
-    }
-}
-
-void BattleManager::attack(int attackerX, int attackerY, int defenderX, int defenderY) {
-    int attackerId = getUnitAt(attackerX, attackerY);
-    int defenderId = getUnitAt(defenderX, defenderY);
-
-    if (attackerId < 0) {
-        std::cerr << "[BattleManager] No attacker at (" << attackerX << ", " << attackerY << ")\n";
-        return;
-    }
-
-    if (defenderId < 0) {
-        std::cerr << "[BattleManager] No defender at (" << defenderX << ", " << defenderY << ")\n";
-        return;
-    }
-
-    std::cout << "[BattleManager] Battle: Unit " << attackerId
-        << " vs Unit " << defenderId << "\n";
-
-    // 実際の戦闘システムを使用する場合は、
-    // UnitDatabaseから取得したユニット情報を使用
-    // 今は簡易版として既存のダメージ計算を使用
-
-    int damage = calculateDamage(attackerId, defenderId);
-    applyDamage(defenderId, damage);
-
-    std::cout << "[BattleManager] Unit " << units_[attackerId].name
-        << " attacked Unit " << units_[defenderId].name
-        << " for " << damage << " damage\n";
-
-    // 撃破時の処理
-    if (units_[defenderId].hp <= 0) {
-        std::cout << "[BattleManager] Unit " << units_[defenderId].name
-            << " has been destroyed!\n";
-        // TODO: 経験値付与
-        // TODO: 撃破カウント増加
-    }
-}
-
-// ユニット追加
-int BattleManager::addUnit(int x, int y, bool isEnemy, const std::string& name) {
-    Unit unit;
-    unit.x = x;
-    unit.y = y;
-    unit.hp = isEnemy ? 10 : 100;  // 敵はHP10、味方はHP100
-    unit.isEnemy = isEnemy;
-    unit.hasActed = false;
-    unit.name = name;
-
-    units_.push_back(unit);
-    int id = static_cast<int>(units_.size()) - 1;
-
-    std::cout << "[BattleManager] Unit added: " << name
-        << " (ID:" << id << ") at (" << x << ", " << y << ") "
-        << (isEnemy ? "Enemy" : "Ally")
-        << " HP:" << unit.hp << "\n";
-
-    return id;
-}
-
-// 行動済みフラグ管理
-void BattleManager::setUnitActed(int unitId, bool acted) {
-    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
-        units_[unitId].hasActed = acted;
-    }
-}
-
-bool BattleManager::hasUnitActed(int unitId) const {
-    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
-        return units_[unitId].hasActed;
+bool BattleManager::hasUnitActed(const std::string& unitId) const {
+    auto it = actedFlags_.find(unitId);
+    if (it != actedFlags_.end()) {
+        return it->second;
     }
     return false;
 }
 
 void BattleManager::resetAllActedFlags(bool enemyOnly) {
-    for (auto& unit : units_) {
-        if (!enemyOnly || unit.isEnemy) {
-            unit.hasActed = false;
+    for (auto& pair : actedFlags_) {
+        if (enemyOnly) {
+            Unit* unit = getUnitById(pair.first);
+            if (unit && unit->getTeam() == Team::Enemy) {
+                pair.second = false;
+            }
+        }
+        else {
+            pair.second = false;
         }
     }
     std::cout << "[BattleManager] Acted flags reset"
         << (enemyOnly ? " (enemies only)" : "") << "\n";
 }
 
-// ユニット情報取得
-bool BattleManager::isEnemyUnit(int unitId) const {
-    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
-        return units_[unitId].isEnemy;
-    }
-    return false;
+bool BattleManager::isEnemyUnit(const std::string& unitId) const {
+    const Unit* unit = findUnitById(unitId);
+    return unit && unit->getTeam() == Team::Enemy;
 }
 
-std::string BattleManager::getUnitName(int unitId) const {
-    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
-        return units_[unitId].name;
-    }
-    return "Unknown";
+std::string BattleManager::getUnitName(const std::string& unitId) const {
+    const Unit* unit = findUnitById(unitId);
+    return unit ? unit->getId() : "Unknown";
 }
 
-// 生存数取得
 int BattleManager::getAliveAllyCount() const {
     int count = 0;
     for (const auto& unit : units_) {
-        if (!unit.isEnemy && unit.hp > 0) {
+        if (unit->getTeam() == Team::Ally && unit->isAlive()) {
             count++;
         }
     }
@@ -214,42 +213,75 @@ int BattleManager::getAliveAllyCount() const {
 int BattleManager::getAliveEnemyCount() const {
     int count = 0;
     for (const auto& unit : units_) {
-        if (unit.isEnemy && unit.hp > 0) {
+        if (unit->getTeam() == Team::Enemy && unit->isAlive()) {
             count++;
         }
     }
     return count;
 }
 
-
-// BattleManager.cpp の末尾に以下のメソッドを追加：
-
-// ユニット情報取得の拡張
-int BattleManager::getUnitHP(int unitId) const {
-    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
-        return units_[unitId].hp;
-    }
-    return 0;
-}
-
-int BattleManager::getUnitMaxHP(int unitId) const {
-    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
-        // 現状は固定値、後でロボットデータから取得
-        return units_[unitId].isEnemy ? 100 : 1000;
-    }
-    return 0;
-}
-
-// ユニットの経験値・レベル管理
-void BattleManager::addExperience(int unitId, int exp) {
-    if (unitId >= 0 && unitId < static_cast<int>(units_.size())) {
-        // TODO: 経験値システムの実装
+void BattleManager::addExperience(const std::string& unitId, int exp) {
+    Unit* unit = getUnitById(unitId);
+    if (unit) {
         std::cout << "[BattleManager] Unit " << unitId
             << " gained " << exp << " exp\n";
+        // TODO: 経験値システムの完全実装
     }
 }
 
-bool BattleManager::checkLevelUp(int unitId) {
+bool BattleManager::checkLevelUp(const std::string& unitId) {
     // TODO: レベルアップ判定
     return false;
+}
+
+std::vector<std::string> BattleManager::getAllUnitIds() const {
+    std::vector<std::string> ids;
+    ids.reserve(units_.size());
+    for (const auto& unit : units_) {
+        ids.push_back(unit->getId());
+    }
+    return ids;
+}
+
+std::vector<std::string> BattleManager::getAllyUnitIds() const {
+    std::vector<std::string> ids;
+    for (const auto& unit : units_) {
+        if (unit->getTeam() == Team::Ally) {
+            ids.push_back(unit->getId());
+        }
+    }
+    return ids;
+}
+
+std::vector<std::string> BattleManager::getEnemyUnitIds() const {
+    std::vector<std::string> ids;
+    for (const auto& unit : units_) {
+        if (unit->getTeam() == Team::Enemy) {
+            ids.push_back(unit->getId());
+        }
+    }
+    return ids;
+}
+
+void BattleManager::printAllUnits() const {
+    std::cout << "\n[BattleManager] === All Units ===\n";
+    for (const auto& unit : units_) {
+        std::cout << "  " << unit->getId()
+            << " (" << (unit->getTeam() == Team::Ally ? "Ally" : "Enemy") << ")"
+            << " at (" << unit->getX() << ", " << unit->getY() << ")"
+            << " HP:" << unit->getHp() << "/" << unit->getMaxHp()
+            << (unit->isAlive() ? "" : " [DESTROYED]")
+            << "\n";
+    }
+    std::cout << "[BattleManager] Total: " << units_.size() << " units\n\n";
+}
+
+Unit* BattleManager::findUnitById(const std::string& unitId) {
+    auto it = unitMap_.find(unitId);
+    return (it != unitMap_.end()) ? it->second : nullptr;
+}
+
+const Unit* BattleManager::findUnitById(const std::string& unitId) const {
+    auto it = unitMap_.find(unitId);
+    return (it != unitMap_.end()) ? it->second : nullptr;
 }

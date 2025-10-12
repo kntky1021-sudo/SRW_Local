@@ -3,6 +3,7 @@
 #include <vector>
 #include <string>
 #include "UnitData.h"
+#include <SDL3_ttf/SDL_ttf.h>
 
 class SDLRenderer;
 class UIManager;
@@ -46,6 +47,14 @@ private:
 
     void drawBox(int x, int y, int w, int h);
     void drawText(const std::string& text, int x, int y);
+
+    // フォント付きテキスト描画（新規追加）
+    void drawTextWithFont(
+        TTF_Font* font,
+        const std::string& text,
+        int x,
+        int y,
+        SDL_Color color);
 
     // 武器が使用可能かチェック
     bool isWeaponUsable(

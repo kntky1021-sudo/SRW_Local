@@ -30,7 +30,7 @@ float BattleCalculator::getTerrainModifier(char adaptation) {
 BattleResult BattleCalculator::execute(
     Unit* attacker,
     Unit* defender,
-    Weapon* weapon,
+    const WeaponData* weapon,
     char terrain)
 {
     BattleResult result{};
@@ -92,7 +92,7 @@ BattleResult BattleCalculator::execute(
 int BattleCalculator::calculateHitRate(
     const Unit* attacker,
     const Unit* defender,
-    const Weapon* weapon,
+    const WeaponData* weapon,
     char terrain)
 {
     // パイロット技量と機体運動性を使用
@@ -135,7 +135,7 @@ int BattleCalculator::calculateEvadeRate(
 
 int BattleCalculator::calculateCriticalRate(
     const Unit* attacker,
-    const Weapon* weapon)
+    const WeaponData* weapon)
 {
     // パイロット技量を使用
     int pilotSkill = attacker->getPilotSkill();
@@ -149,12 +149,12 @@ int BattleCalculator::calculateCriticalRate(
 int BattleCalculator::calculateDamage(
     const Unit* attacker,
     const Unit* defender,
-    const Weapon* weapon,
+    const WeaponData* weapon,
     char terrain,
     bool isCritical)
 {
-    // 武器威力（仮）
-    int weaponPower = attacker->getAttackPower();
+    // 武器威力
+    int weaponPower = weapon ? weapon->power : attacker->getAttackPower();
 
     // 武器属性に応じてパイロット能力を選択
     // TODO: 武器の属性（格闘/射撃）で分岐

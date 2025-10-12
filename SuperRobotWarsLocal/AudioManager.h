@@ -1,23 +1,51 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 
-/**
- * AudioManager
- * ・BGM / SE の再生管理
- * ・将来的に SDL_mixer などを統合
- */
+// 前方宣言
+struct _Mix_Music;
+typedef struct _Mix_Music Mix_Music;
+struct Mix_Chunk;
+
 class AudioManager {
 public:
-    AudioManager() = default;
-    ~AudioManager() = default;
+    AudioManager();
+    ~AudioManager();
 
-    // BGM のロードと再生
-    void playBGM(const std::string& path, bool loop = true);
+    bool initialize();
+    void shutdown();
 
-    // BGM の停止
-    void stopBGM();
+    // BGM
+    bool loadBGM(const std::string& id, const std::string& filepath);
+    void playBGM(const std::string& id, bool loop = true, int fadeInMs = 0);
+    void stopBGM(int fadeOutMs = 0);
+    void pauseBGM();
+    void resumeBGM();
+    void setBGMVolume(int volume);
 
-    // 効果音の再生
-    void playSE(const std::string& path);
+    // SE
+    bool loadSE(const std::string& id, const std::string& filepath);
+    void playSE(const std::string& id, int volume = -1);
+    void stopAllSE();
+    void setSEVolume(int volume);
+
+    // マスター音量
+    void setMasterVolume(int volume);
+
+    // ユーティリティ
+    bool isBGMPlaying() const;
+    std::string getCurrentBGM() const { return currentBGMId_; }
+    void preloadCommonSE();
+
+private:
+    bool initialized_;
+    std::unordered_map<std::string, Mix_Music*> bgmMap_;
+    std::string currentBGMId_;
+    int bgmVolume_;
+    std::unordered_map<std::string, Mix_Chunk*> seMap_;
+    int seVolume_;
+    int masterVolume_;
+
+    void applyMasterVolume();
 };

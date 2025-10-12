@@ -1,7 +1,156 @@
-﻿  Unit.cpp
-  UnitDatabase.cpp
-  WeaponSelectUI.cpp
-C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\WeaponSelectUI.cpp(199,32): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
-C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\WeaponSelectUI.cpp(199,29): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
+﻿  AttackCommand.cpp
+  AudioManager.cpp
+C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(269,16): error C2371: 'Mix_Music': 再定義されています。異なる基本型です。
+  (ソース ファイル 'AudioManager.cpp' をコンパイルしています)
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.h(8,27):
+      'Mix_Music' の宣言を確認してください
+  
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(53,9): error C2664: 'void Mix_FreeMusic(Mix_Music *)': 引数 1 を '_Ty2' から 'Mix_Music *' へ変換できません。
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(53,9): error C2664:         with
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(53,9): error C2664:         [
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(53,9): error C2664:             _Ty2=Mix_Music *
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(53,9): error C2664:         ]
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(53,27):
+      指示された型は関連がありません。変換には reinterpret_cast、C スタイル キャストまたはかっこで囲まれた関数スタイル キャストが必要です。
+      C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(844,30):
+      'Mix_FreeMusic' の宣言を確認してください
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(53,9):
+      引数リスト '(_Ty2)' を一致させようとしているとき
+          with
+          [
+              _Ty2=Mix_Music *
+          ]
+  
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(83,19): error C2440: '=': 'Mix_Music *' から '_Mix_Music *' に変換できません。
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(83,19):
+      指示された型は関連がありません。変換には reinterpret_cast、C スタイル キャストまたはかっこで囲まれた関数スタイル キャストが必要です。
+  
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(108,9): error C2664: 'int Mix_FadeInMusic(Mix_Music *,int,int)': 引数 1 を '_Ty2' から 'Mix_Music *' へ変換できません。
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(108,9): error C2664:         with
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(108,9): error C2664:         [
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(108,9): error C2664:             _Ty2=Mix_Music *
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(108,9): error C2664:         ]
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(108,27):
+      指示された型は関連がありません。変換には reinterpret_cast、C スタイル キャストまたはかっこで囲まれた関数スタイル キャストが必要です。
+      C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(1861,29):
+      'Mix_FadeInMusic' の宣言を確認してください
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(108,9):
+      引数リスト '(_Ty2, int, int)' を一致させようとしているとき
+          with
+          [
+              _Ty2=Mix_Music *
+          ]
+  
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(111,9): error C2664: 'int Mix_PlayMusic(Mix_Music *,int)': 引数 1 を '_Ty2' から 'Mix_Music *' へ変換できません。
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(111,9): error C2664:         with
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(111,9): error C2664:         [
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(111,9): error C2664:             _Ty2=Mix_Music *
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(111,9): error C2664:         ]
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(111,25):
+      指示された型は関連がありません。変換には reinterpret_cast、C スタイル キャストまたはかっこで囲まれた関数スタイル キャストが必要です。
+      C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(1834,29):
+      'Mix_PlayMusic' の宣言を確認してください
+      C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.cpp(111,9):
+      引数リスト '(_Ty2, int)' を一致させようとしているとき
+          with
+          [
+              _Ty2=Mix_Music *
+          ]
+  
+  BattleCalculator.cpp
+  BattleManager.cpp
+  BattleScene.cpp
+  BattleStartCommand.cpp
+  BattleUIManager.cpp
+  Camera.cpp
+  ChoiceCommand.cpp
+  CommandFactory.cpp
+  Cursor.cpp
+  EnemyAttackCommand.cpp
+  EnemyMoveCommand.cpp
+  ExecutionEngine.cpp
+  GameManager.cpp
+  InputManager.cpp
+  main.cpp
+C:\Users\kntky\Documents\inclideFolder\SDL2-2.30.10\include\SDL_rwops.h(246,49): error C2061: 構文エラー: 識別子 'SDL_bool_renamed_bool'
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2-2.30.10\include\SDL_rwops.h(369,9): warning C4005: 'RW_SEEK_SET': マクロが再定義されました。
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+      C:\Users\kntky\Documents\inclideFolder\SDL3-devel-3.2.22-VC\SDL3-3.2.22\include\SDL3\SDL_oldnames.h(1191,9):
+      'RW_SEEK_SET' の以前の定義を確認してください
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2-2.30.10\include\SDL_rwops.h(370,9): warning C4005: 'RW_SEEK_CUR': マクロが再定義されました。
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+      C:\Users\kntky\Documents\inclideFolder\SDL3-devel-3.2.22-VC\SDL3-3.2.22\include\SDL3\SDL_oldnames.h(1189,9):
+      'RW_SEEK_CUR' の以前の定義を確認してください
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2-2.30.10\include\SDL_rwops.h(371,9): warning C4005: 'RW_SEEK_END': マクロが再定義されました。
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+      C:\Users\kntky\Documents\inclideFolder\SDL3-devel-3.2.22-VC\SDL3-3.2.22\include\SDL3\SDL_oldnames.h(1190,9):
+      'RW_SEEK_END' の以前の定義を確認してください
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2-2.30.10\include\SDL_rwops.h(607,31): error C2733: 'SDL_ReadU8': 'extern "C"' リンケージで関数をオーバーロードすることはできません
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+      C:\Users\kntky\Documents\inclideFolder\SDL3-devel-3.2.22-VC\SDL3-3.2.22\include\SDL3\SDL_iostream.h(791,34):
+      'SDL_ReadU8' の宣言を確認してください
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2-2.30.10\include\SDL_rwops.h(725,32): error C2733: 'SDL_WriteU8': 'extern "C"' リンケージで関数をオーバーロードすることはできません
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+      C:\Users\kntky\Documents\inclideFolder\SDL3-devel-3.2.22-VC\SDL3-3.2.22\include\SDL3\SDL_iostream.h(1108,34):
+      'SDL_WriteU8' の宣言を確認してください
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(104,1): error C4430: 型指定子がありません - int と仮定しました。メモ: C++ は int を既定値としてサポートしていません
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(104,35): error C2143: 構文エラー: ';' が '*' の前にありません。
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(104,45): error C4430: 型指定子がありません - int と仮定しました。メモ: C++ は int を既定値としてサポートしていません
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(912,26): error C2143: 構文エラー: ';' が '__cdecl' の前にありません。
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(912,17): error C4430: 型指定子がありません - int と仮定しました。メモ: C++ は int を既定値としてサポートしていません
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(912,34): error C4430: 型指定子がありません - int と仮定しました。メモ: C++ は int を既定値としてサポートしていません
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(980,26): error C2143: 構文エラー: ';' が '__cdecl' の前にありません。
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(980,17): error C4430: 型指定子がありません - int と仮定しました。メモ: C++ は int を既定値としてサポートしていません
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+  
+C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(980,34): error C4430: 型指定子がありません - int と仮定しました。メモ: C++ は int を既定値としてサポートしていません
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+  
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\AudioManager.h(8,27): error C2371: 'Mix_Music': 再定義されています。異なる基本型です。
+  (ソース ファイル 'main.cpp' をコンパイルしています)
+      C:\Users\kntky\Documents\inclideFolder\SDL2_mixer-2.8.1\include\SDL_mixer.h(269,16):
+      'Mix_Music' の宣言を確認してください
+  
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\main.cpp(19,26): warning C4804: '<': 演算中の 'bool' 型の使用方法が安全ではありません
+  MoveCommand.cpp
+  Parser.cpp
+  PlayerMoveCommand.cpp
   コードを生成中...
-  SuperRobotWarsLocal.vcxproj -> C:\Users\kntky\source\repos\SuperRobotWarsLocal\x64\Debug\SuperRobotWarsLocal.exe
+  コンパイル中...
+  ReachableArea.cpp
+  Scenario.cpp
+  ScriptLoader.cpp
+  SDLRenderer.cpp
+  ShowMessageCommand.cpp
+  BattleMap.cpp
+  TextureManager.cpp
+  TileMap.cpp
+  UIManagerSDL.cpp
+  Unit.cpp
+  UnitDatabase.cpp
+  WaitCommand.cpp
+  WeaponSelectUI.cpp
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\WeaponSelectUI.cpp(216,32): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
+C:\Users\kntky\source\repos\SuperRobotWarsLocal\SuperRobotWarsLocal\WeaponSelectUI.cpp(216,29): warning C4244: '引数': 'int' から 'float' への変換です。データが失われる可能性があります。
+  コードを生成中...

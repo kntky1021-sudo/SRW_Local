@@ -3,7 +3,7 @@
 #include <memory>
 
 class Unit;
-class Weapon;
+struct WeaponData;  // Weapon* ではなく WeaponData を使用
 
 /// 戦闘計算結果
 struct BattleResult {
@@ -29,7 +29,7 @@ public:
     static BattleResult execute(
         Unit* attacker,
         Unit* defender,
-        Weapon* weapon,
+        const WeaponData* weapon,
         char terrain = 'L'
     );
 
@@ -38,7 +38,7 @@ public:
     static int calculateHitRate(
         const Unit* attacker,
         const Unit* defender,
-        const Weapon* weapon,
+        const WeaponData* weapon,
         char terrain
     );
 
@@ -53,7 +53,7 @@ public:
     /// @return クリティカル率（0-100%）
     static int calculateCriticalRate(
         const Unit* attacker,
-        const Weapon* weapon
+        const WeaponData* weapon
     );
 
     /// @brief ダメージを計算（命中時）
@@ -62,7 +62,7 @@ public:
     static int calculateDamage(
         const Unit* attacker,
         const Unit* defender,
-        const Weapon* weapon,
+        const WeaponData* weapon,
         char terrain,
         bool isCritical
     );
